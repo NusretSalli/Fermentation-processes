@@ -1,11 +1,13 @@
 
 rm(list=ls())
 
-require(deSolve)
+install.packages("vctrs")
 
-require(ggplot2)
+#require(deSolve)
 
-require(tidyr)
+#require(ggplot2)
+
+#require(tidyr)
 
 base_model <- function(t,x,p)
 {
