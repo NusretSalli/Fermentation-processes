@@ -65,8 +65,11 @@ ggplot(data = output, aes(x = time, y = G)) + geom_point(size = 3, color = "blue
   ylim(0, max(output$G)+5)
 
 
+plot(sol[,2], sol[,3])
+lines(sol[,2], sol[,3])
 
-#### Plane PHASE analysis ####
+
+#### PHASE PLANE ANALYSIS ####
 
 
 plane_plot <- function(t, y, parameters) {
@@ -77,7 +80,7 @@ plane_plot <- function(t, y, parameters) {
   return(list(dy))
 }
 
-phase_plan_plot <- function(t,parameters){
+phase_plane_plot <- function(t, func_var, parameters){
   
   rate <- parameters[1]
   
@@ -86,23 +89,33 @@ phase_plan_plot <- function(t,parameters){
   G_medium <- parameters[3]
   
   
-  #dN <- numeric(1)
+  diff_eq <- numeric(2)
   
-  #dG <- numeric(1)
   
-  dN <- rate * N * G - flow * N
+  diff_eq[1] <- rate * func_var[1] * func_var[2] - flow * func_var[1]
   
-  dG <- flow * (G_medium - G) - rate * N * G
+  diff_eq[2] <- flow * (G_medium - func_var[2]) - rate * func_var[1] * func_var[2]
   
-  return(list(c(dN,dG)))
+  return(list(diff_eq))
   
 }
 
 #plotting_phase <- flowField(plane_plot, xlim = c(-3,3), ylim = c(-3,3), parameters = 1, points = 21, add= FALSE)
 
-phaseplan_analysis <- phasePlaneAnalysis(plane_plot, xlim = c(0,200), ylim = c(0,40), tend = 100, parameters = c(p$rate, p$flow, p$G_medium), add= FALSE)
+#phaseplan_analysis <- phasePlaneAnalysis(plane_plot, xlim = c(-3,3), ylim = c(-3,3), tend = 100, parameters = -2, add= FALSE)
 
-#help("phaseR")
+phasplane_analysis <- phasePlaneAnalysis(phase_plane_plot,
+                                         xlim = c(0,400),
+                                         ylim = c(0,100),
+                                         tend = 300,
+                                         parameters = c(p$rate, p$flow, p$G_medium),
+                                         add= FALSE,
+                                         state.names = c("N", "G"))
+
+
+## SENSITIVITY ANALYSIS ##
+
+
 
 
 
