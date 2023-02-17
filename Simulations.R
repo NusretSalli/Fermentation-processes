@@ -9,6 +9,8 @@ require(tidyr)
 
 require(phaseR)
 
+require(ODEsensitivity)
+
 base_model <- function(t,x,p)
 {
   ## Unpack state by hand 
@@ -43,7 +45,7 @@ p$rate <- 0.06
 
 p$flow <- 0.75 # this shouldn't change from 0.75
 
-p$G_medium <- 400
+p$G_medium <- 100
 
 
 time <- seq(0,30,1)
@@ -63,10 +65,6 @@ ggplot(data = output, aes(x = time, y = N)) + geom_point(size = 3, color = "blue
 ggplot(data = output, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", size = 1.5) + 
   labs(title = "Glucose levels", x = "time", y = "glucose levels") + 
   ylim(0, max(output$G)+5)
-
-
-plot(sol[,2], sol[,3])
-lines(sol[,2], sol[,3])
 
 
 #### PHASE PLANE ANALYSIS ####
@@ -115,11 +113,115 @@ phasplane_analysis <- phasePlaneAnalysis(phase_plane_plot,
 
 ## SENSITIVITY ANALYSIS ##
 
+# pre-analysis - setting everything up #
+
+base_model_sensitivity <- function(t,x,p){
+  with(as.list(c(x,p)), {
+    
+    dN <- rate * N * G - flow * N
+    
+    dG <- flow * (G_medium - G) - rate * N * G
+    
+    return(list(c(dN, dG)))
+    
+  })
+}
 
 
+bound_pars <- c("rate", "flow", "G_medium")
+
+bound_min <- c(0.001, 0.20, 50)
+
+bound_max <- c(0.15, 0.95, 700)
+
+time_val <- c(0.01, seq(1, 30, by = 1))
+
+# sobol #
+
+sensitive_sobol <- ODEsobol(mod = base_model_sensitivity,
+                            pars = bound_pars,
+                            state_init = x0,
+                            times = time_val,
+                            n = 2000,
+                            rfuncs = "runif",
+                            rargs = paste0("min = ", bound_min,
+                                           ", max = ", bound_max),
+                            sobol_method = "Martinez",
+                            ode_method = "lsoda",
+                            parallel_eval = TRUE,
+                            parallel_eval_ncores = 2)
 
 
+plot(sensitive_sobol, pars_plot = bound_pars, state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 2)
+
+plot(sensitive_sobol, pars_plot = bound_pars, state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 2)
+
+# morris # 
+
+help("ODEsensitivity")
+
+sensitive_morris <- ODEmorris(base_model_sensitivity,
+          pars = bound_pars,
+          state_init = x0,
+          times = time_val,
+          binf = bound_min,
+          bsup = bound_max,
+          r = 500,
+          design = list(type = "oat",
+                        levels = 10,
+                        grid.jump =1),
+          scale = TRUE,
+          ode_method = "lsoda",
+          parallel_eval = TRUE,
+          parallel_eval_ncores = 2)
+
+sensitive_morris$N
+
+plot(sensitive_morris, pars_plot = bound_pars, state_plot = "N", kind = "sep", main_title = "N sensitivity - Morris", type = "l")
+
+plot(sensitive_morris, pars_plot = bound_pars, state_plot = "G", kind = "sep", main_title = "G sensitivity - Morris", type = "l")
+
+# PRCC #
+
+n_iterations <- 1000
+
+rate_list <- runif(n_iterations, min = 0.001, max = 0.2)
+
+flow_list <- runif(n_iterations, min = 0.2, max = 0.95)
+
+G_medium_list <- runif(n_iterations, min = 50, max = 700)
+
+N_end <- numeric(n_iterations)
+
+G_end <- numeric(n_iterations)
+
+for ( i in 1:n_iterations){
+  
+  # simulate the differential equations and solve them
+  
+  parameter_list <- list()
+  
+  parameter_list$rate <- rate_list[i]
+  
+  parameter_list$flow <- flow_list[i]
+  
+  parameter_list$G_medium <- G_medium_list[i]
+  
+  output <- ode(x0,time,base_model,parameter_list)
+  
+  N_end[i] <- mean(tail(output[,"N"],n=3))
+  
+  G_end[i] <- mean(tail(output[,"G"],n=3))
+  
+  
+  
+}
+
+sim_result <- data.frame(rate = rate_list,
+                         flow = flow_list,
+                         G_medium = G_medium_list,
+                         N_end,
+                         G_end)
 
 
-
-
+tail(output[,"S"],n=10)
