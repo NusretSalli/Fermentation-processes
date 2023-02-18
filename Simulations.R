@@ -166,7 +166,7 @@ sensitive_morris <- ODEmorris(base_model_sensitivity,
           times = time_val,
           binf = bound_min,
           bsup = bound_max,
-          r = 500,
+          r = 1000,
           design = list(type = "oat",
                         levels = 10,
                         grid.jump =1),
@@ -175,15 +175,13 @@ sensitive_morris <- ODEmorris(base_model_sensitivity,
           parallel_eval = TRUE,
           parallel_eval_ncores = 2)
 
-sensitive_morris$N
-
 plot(sensitive_morris, pars_plot = bound_pars, state_plot = "N", kind = "sep", main_title = "N sensitivity - Morris", type = "l")
 
 plot(sensitive_morris, pars_plot = bound_pars, state_plot = "G", kind = "sep", main_title = "G sensitivity - Morris", type = "l")
 
 # PRCC #
 
-n_iterations <- 1000
+n_iterations <- 3000
 
 rate_list <- runif(n_iterations, min = 0.001, max = 0.2)
 
@@ -229,22 +227,37 @@ sim_result <- data.frame(rate = rate_list,
 pairs(sim_result)
 
 
-N_PRCC <- epi.prcc(sim_result[,c(1,2,3,4)]) #
+N_PRCC <- epi.prcc(sim_result[,c(1,2,3,4)])
 
-G_PRCC <- epi.prcc(sim_result[,c(1,2,3,5)]) #
+G_PRCC <- epi.prcc(sim_result[,c(1,2,3,5)])
 
+state <- c("N", "N", "N", "G", "G", "G")
 
-total_PRCC <- 
+NG_PRCC <- rbind(N_PRCC[1:4], G_PRCC[1:4])
+
+NG_PRCC$est <- round(NG_PRCC$est, digits = 2)
+
+total_PRCC <- cbind(NG_PRCC, state)
 
 
 
 # plotting #
 
-ggplot(N_PRCC) +
-  geom_bar(aes(x = N_PRCC$var, y = N_PRCC$est),
-           stat = "identity",
-           fill="skyblue",
-           alpha=0.7)
+ggplot(data = total_PRCC, aes(x = var,
+                              weight = est,
+                              ymin = lower,
+                              ymax = upper,
+                              fill = state)) +
+  geom_bar(position=position_dodge(),
+           aes(y=est),
+           stat="identity") +
+  
+  geom_errorbar(position=position_dodge(width=0.9),
+                colour="dark green",
+                size = 1.1)+
+  labs(y = "PRCC coefficient", title = "PRCC bar plot with 95% conf interval")
+
+
 
 
 
