@@ -11,6 +11,8 @@ require(phaseR)
 
 require(ODEsensitivity)
 
+require(epiR)
+
 base_model <- function(t,x,p)
 {
   ## Unpack state by hand 
@@ -45,7 +47,7 @@ p$rate <- 0.06
 
 p$flow <- 0.75 # this shouldn't change from 0.75
 
-p$G_medium <- 100
+p$G_medium <- 400
 
 
 time <- seq(0,30,1)
@@ -59,10 +61,10 @@ output <- data.frame(sol)
 #### plotting section ####
 
 
-ggplot(data = output, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", size = 1.5) + 
+ggplot(data = output, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
   labs(title = "Number of cells", x = "time", y = "number of cells")
 
-ggplot(data = output, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", size = 1.5) + 
+ggplot(data = output, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
   labs(title = "Glucose levels", x = "time", y = "glucose levels") + 
   ylim(0, max(output$G)+5)
 
@@ -158,8 +160,6 @@ plot(sensitive_sobol, pars_plot = bound_pars, state_plot = "G", main_title = "G 
 
 # morris # 
 
-help("ODEsensitivity")
-
 sensitive_morris <- ODEmorris(base_model_sensitivity,
           pars = bound_pars,
           state_init = x0,
@@ -217,11 +217,34 @@ for ( i in 1:n_iterations){
   
 }
 
+
 sim_result <- data.frame(rate = rate_list,
                          flow = flow_list,
                          G_medium = G_medium_list,
                          N_end,
                          G_end)
 
+# pair plot scatterplot # 
 
-tail(output[,"S"],n=10)
+pairs(sim_result)
+
+
+N_PRCC <- epi.prcc(sim_result[,c(1,2,3,4)]) #
+
+G_PRCC <- epi.prcc(sim_result[,c(1,2,3,5)]) #
+
+
+total_PRCC <- 
+
+
+
+# plotting #
+
+ggplot(N_PRCC) +
+  geom_bar(aes(x = N_PRCC$var, y = N_PRCC$est),
+           stat = "identity",
+           fill="skyblue",
+           alpha=0.7)
+
+
+
