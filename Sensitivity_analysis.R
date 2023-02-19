@@ -12,6 +12,27 @@ base_model_sensitivity <- function(t,x,p){
   })
 }
 
+lactate_model_sensitivity <- function(t,x,p){
+  
+  with(as.list(c(x,p)), {
+    
+    logL <- (1 / (1 + exp(L_log_growth*(G-L_log_mid))))
+    
+    logN <- (0.7 / (1 + exp(N_log_growth*(L-N_log_mid)))) + 0.3
+    
+    dN <- rate * N * G * logN - flow * N
+    
+    dG <- flow * (G_medium - G) - rate * N * G + L * logL
+    
+    dL <- G * N * l_rate - flow * L - L * logL
+    
+    return(list(c(dN, dG, dL)))
+    
+    
+  })
+  
+}
+
 
 sobol_sensitivity <- function(model, var_pars, x0_init, var_min, var_max, time_val){
   
@@ -19,7 +40,7 @@ sobol_sensitivity <- function(model, var_pars, x0_init, var_min, var_max, time_v
                            pars = var_pars,
                            state_init = x0_init,
                            times = time_val,
-                           n = 2000,
+                           n = 1000,
                            rfuncs = "runif",
                            rargs = paste0("min = ", bound_min,
                                           ", max = ", bound_max),

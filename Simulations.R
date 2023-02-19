@@ -51,7 +51,7 @@ p$N_log_mid <- 20
 
 time <- seq(0,30,1)
 
-sol <- ode(x0_base,time,base_model,p)
+sol <- ode(x0,time,lactate_model,p)
 
 output <- data.frame(sol)
 
@@ -102,7 +102,7 @@ phaseplan <- phase_plan_analysis(phase_plane_plot_base,
 
 ## SENSITIVITY ANALYSIS ##
 
-# base model # 
+# base model - sobol # 
 
 bound_pars <- c("rate", "flow", "G_medium")
 
@@ -112,9 +112,32 @@ bound_max <- c(0.15, 0.95, 700)
 
 time_val <- c(0.01, seq(1, 30, by = 1))
 
-# sobol #
+sensitive_sobol_base <- sobol_sensitivity(base_model_sensitivity, bound_pars, x0_base, bound_min, bound_max, time_val)
 
-sensitive_sobol <- sobol_sensitivity(base_model_sensitivity, bound_pars, x0_base, bound_min, bound_max, time_val)
+plot(sensitive_sobol_base, pars_plot = bound_pars, state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 2)
+
+plot(sensitive_sobol_base, pars_plot = bound_pars, state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 2)
+
+
+# lactate model - sobol # 
+
+# change the lactate model such that the logN and LogL's min / max value are changing from 0 to 1 - maybe that will fix it
+
+bound_pars_lac <- c("rate", "flow", "G_medium", "l_rate", "L_log_growth", "N_log_growth", "L_log_mid", "N_log_mid")
+
+bound_min_lac <- c(0.001, 0.20, 50, 0.001, 0.2, 0.2, 20, 10)
+
+bound_max_lac <- c(0.15, 0.95, 700, 0.15, 1.5, 2.5, 70, 60)
+
+time_val <- c(0.01, seq(1,30, by = 1))
+
+
+sensitive_sobol_lac <- sobol_sensitivity(lactate_model_sensitivity,
+                                         bound_pars_lac,
+                                         x0,
+                                         bound_min_lac,
+                                         bound_max_lac,
+                                         time_val)
 
 
 plot(sensitive_sobol, pars_plot = bound_pars, state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 2)
