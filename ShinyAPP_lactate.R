@@ -19,7 +19,7 @@ source("Sensitivity_analysis.R")
 ui <- fluidPage(
   
   # App title ----
-  titlePanel("Base model demonstration"),
+  titlePanel("Lactate model demonstration"),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -57,7 +57,7 @@ ui <- fluidPage(
       
       sliderInput(inputId = "L_log_growth", 
                   label = "logistic rate growth for lactate",
-                  min = 0, max = 3, value = 0.5),
+                  min = 0, max = 4, value = 0.5, step = 0.1),
       
       sliderInput(inputId = "L_log_mid", 
                   label = "logistic midpoint for lactate",
@@ -65,7 +65,7 @@ ui <- fluidPage(
       
       sliderInput(inputId = "N_log_growth", 
                   label = "logistic rate growth for number of cells",
-                  min = 0, max = 3, value = 0.5),
+                  min = 0, max = 4, value = 0.5, step = 0.1),
       
       sliderInput(inputId = "N_log_mid", 
                   label = "logistic midpoint for number of cells",
