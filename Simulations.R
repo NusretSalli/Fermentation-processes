@@ -13,6 +13,10 @@ require(ODEsensitivity)
 
 require(epiR)
 
+require(dplyr)
+
+require(plotly)
+
 source("Models.R")
 
 source("Phase_analysis.R")
@@ -49,7 +53,7 @@ p$L_log_mid <- 45
 p$N_log_mid <- 20
 
 
-time <- seq(0,30,1)
+time <- seq(0,30,0.1)
 
 sol <- ode(x0,time,lactate_model,p)
 
@@ -83,6 +87,15 @@ ggplot(data = output, aes(x = time, y = logisticL.G)) + geom_point(size = 3, col
 
 #phaseplan_analysis <- phasePlaneAnalysis(plane_plot_base, xlim = c(-3,3), ylim = c(-3,3), tend = 100, parameters = -2, add= FALSE)
 
+## PLOTLY ##
+
+fig <- plot_ly(output, x = ~N, y = ~G, z = ~L, type = 'scatter3d', mode = 'lines',
+               opacity = 1, line = list(width = 6))
+
+fig
+
+
+# phase plan analysis in 2D #
 
 xlim <- c(0,800)
 
@@ -140,30 +153,35 @@ sensitive_sobol_lac <- sobol_sensitivity(lactate_model_sensitivity,
                                          time_val)
 
 
-plot(sensitive_sobol, pars_plot = bound_pars, state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 2)
+plot(sensitive_sobol_lac, pars_plot = bound_pars_lac, state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 2)
 
-plot(sensitive_sobol, pars_plot = bound_pars, state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 2)
+plot(sensitive_sobol_lac, pars_plot = bound_pars_lac, state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 2)
+
+plot(sensitive_sobol_lac, pars_plot = bound_pars_lac, state_plot = "L", main_title = "L sensitivity - SOBOL", type = "l", lwd = 2)
+
 
 # morris # 
 
 
-sensitive_morris <- morris_sensitivity(base_model_sensitivity,
-                                       bound_pars, x0_base,
-                                       bound_min,
-                                       bound_max,
+sensitive_morris_lac <- morris_sensitivity(lactate_model_sensitivity,
+                                       bound_pars_lac, x0,
+                                       bound_min_lac,
+                                       bound_max_lac,
                                        time_val)
 
-plot(sensitive_morris, pars_plot = bound_pars, state_plot = "N", kind = "sep", main_title = "N sensitivity - Morris", type = "l")
+plot(sensitive_morris_lac, pars_plot = bound_pars_lac, state_plot = "N", kind = "sep", main_title = "N sensitivity - Morris", type = "l")
 
-plot(sensitive_morris, pars_plot = bound_pars, state_plot = "G", kind = "sep", main_title = "G sensitivity - Morris", type = "l")
+plot(sensitive_morris_lac, pars_plot = bound_pars_lac, state_plot = "G", kind = "sep", main_title = "G sensitivity - Morris", type = "l")
+
+plot(sensitive_morris_lac, pars_plot = bound_pars_lac, state_plot = "L", kind = "sep", main_title = "L sensitivity - Morris", type = "l")
 
 # PRCC #
 
-state_name <- c("N", "G")
+state_name <- c("N", "G", "L")
 
-param_name <- c("rate", "flow", "G_medium")
+param_name <- c("rate", "flow", "G_medium", "l_rate", "L_log_growth", "N_log_growth", "L_log_mid", "N_log_mid")
 
-n_iterations <- 500
+n_iterations <- 1000
 
 rate_list <- runif(n_iterations, min = 0.001, max = 0.2)
 
@@ -171,46 +189,72 @@ flow_list <- runif(n_iterations, min = 0.2, max = 0.95)
 
 G_medium_list <- runif(n_iterations, min = 50, max = 700)
 
-param_data_frame <- cbind(rate_list, flow_list, G_medium_list)
+l_rate_list <- runif(n_iterations, min = 0.001, max = 0.15)
 
-results_PRCC <- PRCC_calc(base_model, x0_base, state_name, param_name, time, param_data_frame, 500) 
+L_log_growth_list <- runif(n_iterations, min = 0.2, max = 1.5)
 
+N_log_growth_list <- runif(n_iterations, min = 0.2, max = 2.5)
+
+L_log_mid_list <- runif(n_iterations, min = 20, max = 70)
+
+N_log_mid_list <- runif(n_iterations, min = 10, max = 60)
+
+param_data_frame <- cbind(rate_list,
+                          flow_list,
+                          G_medium_list,
+                          l_rate_list,
+                          L_log_growth_list,
+                          N_log_growth_list,
+                          L_log_mid_list,
+                          N_log_mid_list)
+
+results_PRCC <- PRCC_calc(lactate_model,
+                          x0,
+                          state_name,
+                          param_name,
+                          time,
+                          param_data_frame,
+                          n_iterations) 
+
+
+colnames(results_PRCC)[1:length(param_name)] <- param_name 
 
 
 # pair plot scatterplot # 
 
-pairs(sim_result)
+pairs_plot_sim(results_PRCC, state_name, param_name)
 
 
-N_PRCC <- epi.prcc(sim_result[,c(1,2,3,4)])
+# PRCC plot #
 
-G_PRCC <- epi.prcc(sim_result[,c(1,2,3,5)])
+# N_PRCC <- epi.prcc(results_PRCC[,c(1:length(param_name),length(param_name)+1)])
+# 
+# G_PRCC <- epi.prcc(results_PRCC[,c(1:length(param_name),length(param_name)+2)])
+# 
+# L_PRCC <- epi.prcc(results_PRCC[,c(1:length(param_name),length(param_name)+3)])
+# 
+# states <- c("N","G","L")
+# 
+# status <- rep(states, times = 1, each = length(param_name))
+# 
+# NGL_PRCC <- rbind(N_PRCC[1:4],
+#                   G_PRCC[1:4],
+#                   L_PRCC[1:4])
+# 
+# data <- cbind(NGL_PRCC, status)
+# 
+# colnames(data)[1] <- "variables" 
 
-state <- c("N", "N", "N", "G", "G", "G")
-
-NG_PRCC <- rbind(N_PRCC[1:4], G_PRCC[1:4])
-
-NG_PRCC$est <- round(NG_PRCC$est, digits = 2)
-
-total_PRCC <- cbind(NG_PRCC, state)
+PRCC_data <- PRCC_data_maker(results_PRCC, state_name, param_name)
 
 
+# PRCC plot
 
-# plotting #
+PRCC_plot <- PRCC_plot(PRCC_data,status)
 
-ggplot(data = total_PRCC, aes(x = var,
-                              weight = est,
-                              ymin = lower,
-                              ymax = upper,
-                              fill = state)) +
-  geom_bar(position=position_dodge(),
-           aes(y=est),
-           stat="identity") +
-  
-  geom_errorbar(position=position_dodge(width=0.9),
-                colour="dark green",
-                size = 1.1)+
-  labs(y = "PRCC coefficient", title = "PRCC bar plot with 95% conf interval")
+PRCC_plot
+
+
 
 
 

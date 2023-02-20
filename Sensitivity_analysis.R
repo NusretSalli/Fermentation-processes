@@ -40,10 +40,10 @@ sobol_sensitivity <- function(model, var_pars, x0_init, var_min, var_max, time_v
                            pars = var_pars,
                            state_init = x0_init,
                            times = time_val,
-                           n = 1000,
+                           n = 2000,
                            rfuncs = "runif",
-                           rargs = paste0("min = ", bound_min,
-                                          ", max = ", bound_max),
+                           rargs = paste0("min = ", var_min,
+                                          ", max = ", var_max),
                            sobol_method = "Martinez",
                            ode_method = "lsoda",
                            parallel_eval = TRUE,
@@ -61,7 +61,7 @@ morris_sensitivity <- function(model, var_pars, x0_init, var_min, var_max, time_
             times = time_val,
             binf = var_min,
             bsup = var_max,
-            r = 1000,
+            r = 2000,
             design = list(type = "oat",
                           levels = 10,
                           grid.jump =1),
@@ -105,11 +105,78 @@ PRCC_calc <- function(model, state_init, state_name, param_name, time_val, param
     
   }
   
-  return(state_value)
+  sim_result <- data.frame(param_data_frame,
+                           state_value)
+  
+  colnames(sim_result)[1:length(param_name)] <- param_name
+  
+  return(sim_result)
   
 }
 
 
+pairs_plot_sim <- function(sim_dataframe, state_name, param_name){
+  
+  for (i in 1:length(param_name)){
+    
+    reversed_results <- rev(sim_dataframe)
+    
+    selection_vector <- c(1:length(state_name), length(state_name)+i)
+    
+    pairs_plotting_data <- reversed_results[,selection_vector]
+    
+    plot <- pairs(pairs_plotting_data)
+    
+  }
+}
+
+
+PRCC_data_maker <- function(sim_result, state_name, param_name){
+  
+  total_PRCC <- c()
+  
+  for (i in 1:length(state_name)){
+    
+    state_PRCC <- epi.prcc(sim_result[,c(1:length(param_name),length(param_name)+i)])
+    
+    total_PRCC <- rbind(total_PRCC, state_PRCC[1:4])
+    
+  }
+  
+  status <- rep(state_name, times = 1, each = length(param_name))
+  
+  data <- cbind(total_PRCC, status)
+  
+  colnames(data)[1] <- "variables" 
+  
+  return(data)
+  
+}
+
+
+
+PRCC_plot <- function(PRCC_data, status){
+  
+  plot <- ggplot(data = PRCC_data, aes(x = variables,
+                                weight = est,
+                                ymin = lower,
+                                ymax = upper,
+                                fill = status)) +
+    geom_bar(width = 0.6, position=position_dodge(),
+             aes(y=est),
+             stat="identity") +
+    
+    geom_errorbar(position=position_dodge(width=0.6),
+                  colour="black",
+                  size = 1.1, width = 0.4) +
+    labs(y = "PRCC coefficient", title = "PRCC bar plot with 95% conf interval") +
+    theme(axis.text = element_text(size = 10, face = "bold"),
+          axis.title = element_text(size = 15, face = "bold")) +
+    scale_y_continuous(breaks = c(-1,-0.75,-0.5,-0.25,0,0.25,0.5,0.75,1))
+  
+  return(plot)
+  
+}
 
 
 
