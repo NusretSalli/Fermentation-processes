@@ -7,13 +7,19 @@ require(deSolve)
 
 require(ggplot2)
 
+require(epiR)
+
 source("Models.R")
+
+source("Sensitivity_analysis.R")
+
+
 
 # Define UI for app that draws a histogram ----
 ui <- fluidPage(
   
   # App title ----
-  titlePanel("Short demonstration"),
+  titlePanel("Base model demonstration"),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
@@ -29,10 +35,6 @@ ui <- fluidPage(
                   label = "Intial value for G",
                   min = 0, max = 500, value = 50),
       
-      sliderInput(inputId = "L0",
-                  label = "Intial value for L",
-                  min = 0, max = 500, value = 0),
-      
       sliderInput(inputId = "rate", 
                   label = "Rate value",
                   min = 0, max = 0.2, value = 0.1),
@@ -43,7 +45,11 @@ ui <- fluidPage(
       
       sliderInput(inputId = "G_medium", 
                   label = "G_medium value:",
-                  min = 0, max = 700, value = 400)
+                  min = 0, max = 700, value = 400),
+      
+      sliderInput(inputId = "time_end", 
+                  label = "time end:",
+                  min = 0, max = 100, value = 30),
       
     ),
     
@@ -55,7 +61,7 @@ ui <- fluidPage(
       
       plotOutput(outputId = "G_plot"),
       
-      plotOutput(outputId = "L_plot")
+      plotOutput(outputId = "PRCC_plot"),
       
     )
   )
@@ -101,17 +107,77 @@ server <- function(input, output) {
     
   })
   
+  time_end <- reactive({
+    
+    seq(0,input$time_end,1)
+    
+  })
+  
   
   output$N_plot <- renderPlot({
     
-    time <- seq(0,30,1)
-    
-    sol <- ode(initial_states(),time,base_model,diff_eq_values())
+    sol <- ode(initial_states(),time_end(),base_model,diff_eq_values())
     
     output <- data.frame(sol)
     
     ggplot(data = output, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
       labs(title = "Number of cells", x = "time", y = "number of cells")
+    
+    
+  })
+  
+  output$G_plot <- renderPlot({
+    
+    sol <- ode(initial_states(),time_end(),base_model,diff_eq_values())
+    
+    output <- data.frame(sol)
+    
+    ggplot(data = output, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+      labs(title = "Glucose levels", x = "time", y = "glucose levels") + 
+      ylim(0, max(output$G)+5)
+    
+    
+  })
+  
+  
+  output$PRCC_plot <- renderPlot({
+    
+    
+    state_name <- c("N", "G")
+    
+    param_name <- c("rate", "flow", "G_medium")
+    
+    n_iterations <- 100
+    
+    rate_list <- runif(n_iterations, min = 0.001, max = 0.2)
+    
+    flow_list <- runif(n_iterations, min = 0.2, max = 0.95)
+    
+    G_medium_list <- runif(n_iterations, min = 50, max = 700)
+    
+    param_data_frame <- cbind(rate_list,
+                              flow_list,
+                              G_medium_list)
+    
+    results_PRCC <- PRCC_calc(base_model,
+                              initial_states(),
+                              state_name,
+                              param_name,
+                              time_end(),
+                              param_data_frame,
+                              n_iterations) 
+    
+    
+    colnames(results_PRCC)[1:length(param_name)] <- param_name 
+    
+    
+    PRCC_data <- PRCC_data_maker(results_PRCC, state_name, param_name)
+    
+    status <- rep(state_name, times = 1, each = length(param_name))
+    
+    PRCC_plot <- PRCC_plot(PRCC_data,status)
+    
+    PRCC_plot
     
     
   })
