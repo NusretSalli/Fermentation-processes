@@ -101,7 +101,9 @@ xlim <- c(0,800)
 
 ylim <- c(0,100)
 
-param_list <- c(p$rate, p$flow, p$G_medium)
+param_list <- c(p$rate,
+                p$flow,
+                p$G_medium)
 
 state_names <- c("N", "G")
 
