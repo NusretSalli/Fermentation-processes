@@ -87,15 +87,22 @@ final_model <- function(t,x,p)
          
          # G should maybe be "mætning" - maximum number of rate?
          
-         dN <- rate * N * G / (1+ G / G50) * LOGphi + N * L * logxi - flow * N
+         N_rate_inhib <- (1 / (1 + exp(N_rate_inhib_growth*(L-N_rate_inhib_mid))))
          
-         dG <- - rate * N * G / (1+ G / G50) * LOGphi + flow * (G_medium - G) - N * LOGgtri
+         lac_con <- (1 / (1 + exp(lac_con_growth*(G-lac_con_mid))))
          
-         # introduce "switch" in lactate production. 
+         lac_prod <- (1 / (1 + exp(-lac_prod_growth*(G-lac_prod_mid))))
          
-         dL <- N * LOGgtri - flow * L - N * L * logxi
          
-         return(list(c(dN, dG, dL), c(logisticN = logN, logisticL = logL)))
+         
+         dN <- rate * N * G / (1 + G / G50) * N_rate_inhib + N * L * lac_con - flow * N
+         
+         dG <- - rate * N * G / (1 + G / G50) * N_rate_inhib + flow * (G_medium - G) - N * lac_prod
+         
+         dL <- N * lac_prod - flow * L - N * L * lac_con
+         
+         
+         return(list(c(dN, dG, dL), c(N_rate_inhib = N_rate_inhib, lac_con = lac_con, lac_prod = lac_prod)))
        }
   )
   

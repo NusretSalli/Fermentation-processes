@@ -33,6 +33,35 @@ lactate_model_sensitivity <- function(t,x,p){
   
 }
 
+final_model_sensitivity <- function(t,x,p){
+  
+  with(as.list(c(x,p)), {
+    
+    N_rate_inhib <- (1 / (1 + exp(N_rate_inhib_growth*(L-N_rate_inhib_mid))))
+    
+    lac_con <- (1 / (1 + exp(lac_con_growth*(G-lac_con_mid))))
+    
+    lac_prod <- (1 / (1 + exp(-lac_prod_growth*(G-lac_prod_mid))))
+    
+    
+    
+    dN <- rate * N * G / (1 + G / G50) * N_rate_inhib + N * L * lac_con - flow * N
+    
+    dG <- - rate * N * G / (1 + G / G50) * N_rate_inhib + flow * (G_medium - G) - N * lac_prod
+    
+    dL <- N * lac_prod - flow * L - N * L * lac_con
+    
+    
+    return(list(c(dN, dG, dL), c(N_rate_inhib = N_rate_inhib, lac_con = lac_con, lac_prod = lac_prod)))
+    
+    
+  })
+  
+}
+
+
+
+
 
 sobol_sensitivity <- function(model, var_pars, x0_init, var_min, var_max, time_val){
   
@@ -158,10 +187,10 @@ PRCC_data_maker <- function(sim_result, state_name, param_name){
 PRCC_plot <- function(PRCC_data, status){
   
   plot <- ggplot(data = PRCC_data, aes(x = variables,
-                                weight = est,
-                                ymin = lower,
-                                ymax = upper,
-                                fill = status)) +
+                                       weight = est,
+                                       ymin = lower,
+                                       ymax = upper,
+                                       fill = status)) +
     geom_bar(width = 0.6, position=position_dodge(),
              aes(y=est),
              stat="identity") +
