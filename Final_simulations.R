@@ -41,9 +41,9 @@ p$rate <- 0.1
 
 p$flow <- 0.35 # this shouldn't change from 0.75
 
-p$G_medium <- 700
+p$G_medium <- 600
 
-p$G50 <- 100
+p$G50 <- 50
 
 p$N_rate_inhib_growth <- 0.2
 
@@ -152,7 +152,7 @@ bound_max_var <- c(0.7,
 time_val <- c(0.01, seq(0.1,30, by = 0.1))
 
 
-sensitive_sobol_lac <- sobol_sensitivity(final_model_sensitivity,
+sensitive_sobol_final <- sobol_sensitivity(final_model_sensitivity,
                                          bound_var,
                                          x0,
                                          bound_min_var,
@@ -160,11 +160,11 @@ sensitive_sobol_lac <- sobol_sensitivity(final_model_sensitivity,
                                          time_val)
 
 
-plot(sensitive_sobol_lac, pars_plot = bound_var, state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 2)
+plot(sensitive_sobol_final, pars_plot = bound_var, state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 2)
 
-plot(sensitive_sobol_lac, pars_plot = bound_var, state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 2)
+plot(sensitive_sobol_final, pars_plot = bound_var, state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 2)
 
-plot(sensitive_sobol_lac, pars_plot = bound_var, state_plot = "L", main_title = "L sensitivity - SOBOL", type = "l", lwd = 2)
+plot(sensitive_sobol_final, pars_plot = bound_var, state_plot = "L", main_title = "L sensitivity - SOBOL", type = "l", lwd = 2)
 
 
 # morris # 
