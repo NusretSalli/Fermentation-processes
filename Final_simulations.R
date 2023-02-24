@@ -23,6 +23,9 @@ source("Phase_analysis.R")
 
 source("Sensitivity_analysis.R")
 
+source("helper functions/3dplot.R")
+
+source("helper functions/2dplot.R")
 
 
 ## Initial state
@@ -36,11 +39,11 @@ p <- list()
 
 p$rate <- 0.1
 
-p$flow <- 0.75 # this shouldn't change from 0.75
+p$flow <- 0.35 # this shouldn't change from 0.75
 
-p$G_medium <- 400
+p$G_medium <- 700
 
-p$G50 <- 60
+p$G50 <- 100
 
 p$N_rate_inhib_growth <- 0.2
 
@@ -52,7 +55,7 @@ p$N_rate_inhib_mid <- 50
 
 p$lac_con_mid <- 60
 
-p$lac_prod_mid <- 50
+p$lac_prod_mid <- 30
 
 time <- seq(0,30,0.1)
 
