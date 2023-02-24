@@ -23,9 +23,11 @@ source("Phase_analysis.R")
 
 source("Sensitivity_analysis.R")
 
-source("helper functions/3dplot.R")
+#source("helper functions/3dplot.R")
 
-source("helper functions/2dplot.R")
+#source("helper functions/2dplot.R")
+
+source("Parameter_estimation.R")
 
 
 ## Initial state
@@ -39,9 +41,9 @@ p <- list()
 
 p$rate <- 0.1
 
-p$flow <- 0.35 # this shouldn't change from 0.75
+p$flow <- 0.75 # this shouldn't change from 0.75
 
-p$G_medium <- 600
+p$G_medium <- 400
 
 p$G50 <- 50
 
@@ -62,6 +64,29 @@ time <- seq(0,30,0.1)
 sol <- ode(x0,time,final_model,p)
 
 output <- data.frame(sol)
+
+
+p_new <- list()
+
+p_new$rate <- 0.6
+
+p_new$flow <- 0.75 # this shouldn't change from 0.75
+
+p_new$G_medium <- 800
+
+p_new$G50 <- 30
+
+p_new$N_rate_inhib_growth <- 0.2
+
+p_new$lac_con_growth <- 0.2
+
+p_new$lac_prod_growth <- 0.2
+
+p_new$N_rate_inhib_mid <- 50
+
+p_new$lac_con_mid <- 60
+
+p_new$lac_prod_mid <- 30
 
 #### plotting section ####
 
@@ -153,11 +178,11 @@ time_val <- c(0.01, seq(0.1,30, by = 0.1))
 
 
 sensitive_sobol_final <- sobol_sensitivity(final_model_sensitivity,
-                                         bound_var,
-                                         x0,
-                                         bound_min_var,
-                                         bound_max_var,
-                                         time_val)
+                                           bound_var,
+                                           x0,
+                                           bound_min_var,
+                                           bound_max_var,
+                                           time_val)
 
 
 plot(sensitive_sobol_final, pars_plot = bound_var, state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 2)
@@ -261,7 +286,57 @@ PRCC_plot
 
 
 
+# parameter estimation
 
+new_sol <- ode(x0,time,final_model,p_new)
 
+output_new <- data.frame(new_sol)
 
+resulting_param <- stochastic_estimation(final_model,x0,p,time,0.1,output_new,1000)
 
+n_iterations = 1000
+
+for (i in 1:n_iterations){
+  
+  output <- ode(x0,time,final_model,p)
+  
+  result_output <- output[,2:c(1+length(x0))]
+  
+  
+  param_changing <- unlist(p)
+  
+  
+  # calculating the error
+  
+  error <- error_function(result_output, output_new)
+  
+  # make a random sign generator that gives either 1 or -1
+  
+  rand_sign <- 2*sample(c(0,1), replace=TRUE, size=1)-1
+  
+  # creating a random number from 1 to the number of 
+  
+  rand_index <- sample(1:length(p),1)
+  
+  
+  param_changing[rand_index] <- param_changing[rand_index] + 0.1 * rand_sign
+  
+  
+  new_output <- ode(x0, time, final_model, param_changing)
+  
+  new_result_output <- new_output[,2:c(1+length(x0))]
+  
+  new_error <- error_function(new_result_output, data)
+  
+  if (new_error < error){
+    
+    parameters[rand_index] <- param_changing[rand_index]
+    
+  }
+  
+} 
+  
+  
+  
+  
+  
