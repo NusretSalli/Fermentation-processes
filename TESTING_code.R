@@ -8,7 +8,13 @@ source("helper functions/3dplot.R")
 
 source("helper functions/2dplot.R")
 
+source("Sensitivity_analysis.R")
+
+source("Parameter_estimation.R")
+
 require(deSolve)
+
+require(FME)
 
 ## Initial state
 N0 <- 5
@@ -21,11 +27,11 @@ p <- list()
 
 p$rate <- 0.1
 
-p$flow <- 0.35 # this shouldn't change from 0.75
+p$flow <- 0.75 # this shouldn't change from 0.75
 
-p$G_medium <- 700
+p$G_medium <- 400
 
-p$G50 <- 100
+p$G50 <- 50
 
 p$N_rate_inhib_growth <- 0.2
 
@@ -74,10 +80,10 @@ model <- function(t,x,p){
 
 
 
-p <- c(rate = 0.1,
-       flow = 0.75,
-       G_medium = 400,
-       G50 = 60,
+p <- c(rate = 0.8,
+       flow = 0.25,
+       G_medium = 800,
+       G50 = 20,
        N_rate_inhib_growth = 0.2,
        lac_con_growth = 0.2,
        lac_prod_growth = 0.2,
@@ -93,6 +99,92 @@ s <- c(N = N0, G = G0, L = L0)
 
 data <- output[1:4]
 
+fixed = list(N = N0, G = G0, L = L0)
+
 f_result <- fit()
 
 summary(f_result)
+
+
+
+
+### parameter estimation using modfit()
+
+parameters <- c(rate = 0.199,
+       flow = 0.75,
+       G_medium = 800,
+       G50 = 50,
+       N_rate_inhib_growth = 0.2,
+       lac_con_growth = 0.2,
+       lac_prod_growth = 0.2,
+       N_rate_inhib_mid = 50,
+       lac_con_mid = 60,
+       lac_prod_mid = 50)
+
+N0 <- 5
+G0 <- 400
+L0 <- 0
+
+init <- c(N = N0, G = G0, L = L0)
+
+time <- seq(0,30,0.1)
+
+output_est <- ode(init,time,final_model_estimation,parameters)
+
+
+new_param <- c(rate = 0.6,
+               flow = 0.75,
+               G_medium = 600,
+               G50 = 30,
+               N_rate_inhib_growth = 0.2,
+               lac_con_growth = 0.2,
+               lac_prod_growth = 0.2,
+               N_rate_inhib_mid = 50,
+               lac_con_mid = 60,
+               lac_prod_mid = 50)
+
+output_real <- ode(init,time,final_model_estimation,new_param)
+
+
+modcost_test <- modCost(output_est,output_real, x = "time")
+
+
+error_functional_test <- function(param){
+  
+  est <- ode(init,time,final_model_estimation,param)
+  
+  return(modCost(est,output_real, x = "time"))
+  
+  
+}
+
+bound_min_var <- c(0.001,
+                   0.20,
+                   50,
+                   10,
+                   0.1,
+                   0.1,
+                   0.1,
+                   10,
+                   10,
+                   10)
+
+bound_max_var <- c(0.7,
+                   0.95,
+                   1000,
+                   400,
+                   2,
+                   2,
+                   2,
+                   120,
+                   120,
+                   120)
+
+
+fit <- modFit(error_functional_test, p = parameters, lower = bound_min_var, upper = bound_max_var)
+
+
+output_estimated <- ode(init, time, final_model_estimation,fit$par)
+
+
+

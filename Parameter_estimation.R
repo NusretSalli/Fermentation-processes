@@ -2,6 +2,35 @@
 require(deSolve)
 
 
+final_model_estimation <- function(t,x,p){
+  
+  with(as.list(c(x,p)), {
+    
+    N_rate_inhib <- (1 / (1 + exp(N_rate_inhib_growth*(L-N_rate_inhib_mid))))
+    
+    lac_con <- (1 / (1 + exp(lac_con_growth*(G-lac_con_mid))))
+    
+    lac_prod <- (1 / (1 + exp(-lac_prod_growth*(G-lac_prod_mid))))
+    
+    
+    
+    dN <- rate * N * G / (1 + G / G50) * N_rate_inhib + N * L * lac_con - flow * N
+    
+    dG <- - rate * N * G / (1 + G / G50) * N_rate_inhib + flow * (G_medium - G) - N * lac_prod
+    
+    dL <- N * lac_prod - flow * L - N * L * lac_con
+    
+    
+    return(list(c(dN, dG, dL)))
+    
+    
+  })
+  
+}
+
+
+
+
 
 error_function <- function(result, data){
   
@@ -16,7 +45,8 @@ error_function <- function(result, data){
 
 
 
-stochastic_estimation <- function(model, initial, parameters, time_interval,step_size,data,n_iterations){
+
+stochastic_estimation <- function(model, initial, parameters,param_name, time_interval,step_size,data,n_iterations){
   
   for (i in 1:n_iterations){
     
@@ -41,11 +71,22 @@ stochastic_estimation <- function(model, initial, parameters, time_interval,step
     rand_index <- sample(1:length(parameters),1)
     
     
-    param_changing[rand_index] <- param_changing[rand_index] + step_size * rand_sign
+    param_changing[rand_index] <- param_changing[rand_index] + step_size[rand_index] * rand_sign
     
     # error here - we need to have it as a list in param_changing
     
-    new_output <- ode(initial, time_interval, model, param_changing)
+    param_changed <- list()
+    
+    for (l in 1:length(param_name)){
+      
+      param_changed[l] <- param_changing[l]
+      
+    }
+    
+    names(param_changed) <- param_name
+    
+    
+    new_output <- ode(initial, time_interval, model, param_changed)
     
     new_result_output <- new_output[,2:c(1+length(initial))]
     
@@ -53,7 +94,7 @@ stochastic_estimation <- function(model, initial, parameters, time_interval,step
     
     if (new_error < error){
       
-      parameters[rand_index] <- param_changing[rand_index]
+      parameters[rand_index] <- param_changed[rand_index]
       
     }
     
@@ -64,5 +105,12 @@ stochastic_estimation <- function(model, initial, parameters, time_interval,step
   
 }
 
+
+deterministic_estimation <- function(){
+  
+  what = 2
+  
+  
+}
 
 

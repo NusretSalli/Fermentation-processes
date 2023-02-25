@@ -68,7 +68,7 @@ output <- data.frame(sol)
 
 p_new <- list()
 
-p_new$rate <- 0.6
+p_new$rate <- 0.1
 
 p_new$flow <- 0.75 # this shouldn't change from 0.75
 
@@ -292,51 +292,109 @@ new_sol <- ode(x0,time,final_model,p_new)
 
 output_new <- data.frame(new_sol)
 
-resulting_param <- stochastic_estimation(final_model,x0,p,time,0.1,output_new,1000)
+param_name <- c("rate",
+                "flow",
+                "G_medium",
+                "G50",
+                "N_rate_inhib_growth",
+                "lac_con_growth",
+                "lac_prod_growth",
+                "N_rate_inhib_mid",
+                "lac_con_mid",
+                "lac_prod_mid")
 
-n_iterations = 1000
+n_iterations = 10000
 
-for (i in 1:n_iterations){
+step_size <- c(0.1, 0.1, 10, 5, 0.1, 0.1, 0.1, 5, 5, 5)
+
+resulting_param <- stochastic_estimation(final_model,x0,p,param_name,time,step_size,output_new,n_iterations)
+
+
+## PARAMETER ESTIMATION - WITH FDE PACKAGE and its FIT() function ##
+
+
+parameters <- c(rate = 0.199,
+                flow = 0.75,
+                G_medium = 800,
+                G50 = 50,
+                N_rate_inhib_growth = 0.2,
+                lac_con_growth = 0.2,
+                lac_prod_growth = 0.2,
+                N_rate_inhib_mid = 50,
+                lac_con_mid = 60,
+                lac_prod_mid = 50)
+
+N0 <- 5
+G0 <- 400
+L0 <- 0
+
+init <- c(N = N0, G = G0, L = L0)
+
+time <- seq(0,30,0.1)
+
+output_est <- ode(init,time,final_model_estimation,parameters)
+
+
+new_param <- c(rate = 0.6,
+               flow = 0.75,
+               G_medium = 600,
+               G50 = 30,
+               N_rate_inhib_growth = 0.2,
+               lac_con_growth = 0.2,
+               lac_prod_growth = 0.2,
+               N_rate_inhib_mid = 50,
+               lac_con_mid = 60,
+               lac_prod_mid = 50)
+
+output_real <- ode(init,time,final_model_estimation,new_param)
+
+
+modcost_test <- modCost(output_est,output_real, x = "time")
+
+
+error_functional_test <- function(param){
   
-  output <- ode(x0,time,final_model,p)
+  est <- ode(init,time,final_model_estimation,param)
   
-  result_output <- output[,2:c(1+length(x0))]
-  
-  
-  param_changing <- unlist(p)
+  return(modCost(est,output_real, x = "time"))
   
   
-  # calculating the error
-  
-  error <- error_function(result_output, output_new)
-  
-  # make a random sign generator that gives either 1 or -1
-  
-  rand_sign <- 2*sample(c(0,1), replace=TRUE, size=1)-1
-  
-  # creating a random number from 1 to the number of 
-  
-  rand_index <- sample(1:length(p),1)
-  
-  
-  param_changing[rand_index] <- param_changing[rand_index] + 0.1 * rand_sign
-  
-  
-  new_output <- ode(x0, time, final_model, param_changing)
-  
-  new_result_output <- new_output[,2:c(1+length(x0))]
-  
-  new_error <- error_function(new_result_output, data)
-  
-  if (new_error < error){
-    
-    parameters[rand_index] <- param_changing[rand_index]
-    
-  }
-  
-} 
-  
-  
+}
+
+bound_min_var <- c(0.001,
+                   0.20,
+                   50,
+                   10,
+                   0.1,
+                   0.1,
+                   0.1,
+                   10,
+                   10,
+                   10)
+
+bound_max_var <- c(0.7,
+                   0.95,
+                   1000,
+                   400,
+                   2,
+                   2,
+                   2,
+                   120,
+                   120,
+                   120)
+
+
+fit <- modFit(error_functional_test,
+              p = parameters,
+              lower = bound_min_var,
+              upper = bound_max_var,
+              method = "Pseudo")
+
+
+output_estimated <- ode(init, time, final_model_estimation,fit$par)
+
+fit$ssr
+ 
   
   
   
