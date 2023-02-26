@@ -1,17 +1,39 @@
 
-
-
-# The base model which only have G and N as differential equations
+library(docstring)
 
 base_model <- function(t,x,p)
 {
+  
+  #' function that computes dn and dg with our base model.
+  #' 
+  #' input:
+  #' 
+  #' t -> time vector 
+  #' x -> essentially our states
+  #' p -> parameters used in the ODEs
+  #' 
+  #' 
+  #' Uses:
+  #' 
+  #' used in Desolve's ode-function to solve these ODEs numerically.
+  #' 
+  #' Example:
+  #' 
+  #' num_solution <- ode(initial,time_interval, base_model, parameters)
+  
+  
+  
   ## Unpack state by hand 
   n <- length(x) / 2
   N <- x[1:n]
   G <- x[n + (1:n)]
   
+  # defines the derivatives as numeric data structures
+  
   dN <- numeric(n)
   dG <- numeric(n)
+  
+  # defining the ODEs with our parameters.
   
   with(p,
        {
@@ -25,19 +47,41 @@ base_model <- function(t,x,p)
 }
 
 
-# The lactate model which consists of system of differential equations of N, G and L
+
 
 lactate_model <- function(t,x,p)
 {
+  
+  #' function that computes dN, dG and dL with our lactate model.
+  #' 
+  #' input:
+  #' 
+  #' t -> time vector 
+  #' x -> essentially our states
+  #' p -> parameters used in the ODEs
+  #' 
+  #' 
+  #' Uses:
+  #' 
+  #' used in Desolve's ode-function to solve these ODEs numerically.
+  #' 
+  #' Example:
+  #' 
+  #' num_solution <- ode(initial,time_interval, lactate_model, parameters)
+  
   ## Unpack state by hand 
   n <- length(x) / 3
   N <- x[1:n]
   G <- x[n + (1:n)]
   L <- x[2*n + (1:n)]
   
+  # defines the derivatives as numeric data structures
+  
   dN <- numeric(n)
   dG <- numeric(n)
   dL <- numeric(n)
+  
+  # defining the ODEs with our parameters.
   
   with(p,
        {
@@ -66,15 +110,38 @@ lactate_model <- function(t,x,p)
 
 final_model <- function(t,x,p)
 {
+  #' function that computes dN, dG, dL and dP with our final model.
+  #' 
+  #' input:
+  #' 
+  #' t -> time vector 
+  #' x -> essentially our states
+  #' p -> parameters used in the ODEs
+  #' 
+  #' 
+  #' Uses:
+  #' 
+  #' used in Desolve's ode-function to solve these ODEs numerically.
+  #' 
+  #' Example:
+  #' 
+  #' num_solution <- ode(initial,time_interval, final_model, parameters)
+  
+  
   ## Unpack state by hand 
   n <- length(x) / 3
   N <- x[1:n]
   G <- x[n + (1:n)]
   L <- x[2*n + (1:n)]
   
+  # Defines the derivatives as numeric data structures
+  
   dN <- numeric(n)
   dG <- numeric(n)
   dL <- numeric(n)
+  
+  
+  # defining the ODEs with our parameters.
   
   with(p,
        {
