@@ -159,24 +159,73 @@ sobol_sensitivity <- function(model, var_pars, x0_init, var_min, var_max, time_v
 
 morris_sensitivity <- function(model, var_pars, x0_init, var_min, var_max, time_val){
   
+  #' sensitivity analysis maker based on Morris' method
+  #' 
+  #' Inputs:
+  #' 
+  #' model -> the ODEs which you want to analyze
+  #' var_pars -> parameters whose sensitivity will be calculated
+  #' x0_init -> initital value for each state in the system of ODEs
+  #' var_min -> the smallest value the parameters can have (written as a vector)
+  #' var_max -> the largest value the parameters can have (written as a vector)
+  #' time_val -> the time interval, which the sensitivity analysis will take place.
+  #' 
+  #' 
+  #' Output:
+  #' 
+  #' morris_result -> 
+  #' 
+  #' Uses:
+  #' 
+  #' Used to do morris sensitivity analysis
+  #' 
+  
+  # calculating the morris_result data.frame
+  
+  
   ODEmorris(model,
-            pars = var_pars,
-            state_init = x0_init,
-            times = time_val,
-            binf = var_min,
-            bsup = var_max,
-            r = 2000,
-            design = list(type = "oat",
+            pars = var_pars, # the parameter
+            state_init = x0_init, # intiial states
+            times = time_val, # time value
+            binf = var_min, # minimum value the parameters can have
+            bsup = var_max, # maximum value the parameters can have
+            r = 2000, # number of "iterations"
+            design = list(type = "oat", # oat = one at a time
                           levels = 10,
                           grid.jump =1),
             scale = TRUE,
-            ode_method = "lsoda",
-            parallel_eval = TRUE,
-            parallel_eval_ncores = 2)
+            ode_method = "lsoda", # which ode-solver that will be used
+            parallel_eval = TRUE, # parallel evaluation? Yes or no?
+            parallel_eval_ncores = 2) # number of cores to be used to evaluate
 }
 
 
 PRCC_calc <- function(model, state_init, state_name, param_name, time_val, param_data_frame, n_iterations){
+  
+  #' Doing the PRCC calculation
+  #' 
+  #' Inputs:
+  #' 
+  #' model -> the ODEs which you want to analyze
+  #' state_init -> initial state value
+  #' state_name -> Name of the states
+  #' param_name -> vector of the param names.
+  #' time_val -> time value vector
+  #' param_data_frame -> The data frame you get after PRCC simulation
+  #' 
+  #' 
+  #' Output:
+  #' 
+  #' morris_result -> 
+  #' 
+  #' Uses:
+  #' 
+  #' Used to do morris sensitivity analysis
+  #' 
+  
+  # calculating the morris_result data.frame
+  
+  
   
   state_value <- matrix(data = 0, nrow = n_iterations, ncol = length(state_name))
   
