@@ -89,11 +89,11 @@ final_model_analysis <- function(t,x,p){
     
     # defining the logistic regression functions used as inhibitors
     
-    N_rate_inhib <- (1 / (1 + exp(N_rate_inhib_growth*(L-N_rate_inhib_mid))))
+    N_rate_inhib <- (n_rate_inhib_max / (1 + exp(N_rate_inhib_growth*(L-N_rate_inhib_mid)))) + (1-n_rate_inhib_max)
     
-    lac_con <- (1 / (1 + exp(lac_con_growth*(G-lac_con_mid))))
+    lac_con <- (lac_con_max / (1 + exp(lac_con_growth*(G-lac_con_mid)))) + (1-lac_con_max)
     
-    lac_prod <- (1 / (1 + exp(-lac_prod_growth*(G-lac_prod_mid))))
+    lac_prod <- (lac_prod_max / (1 + exp(-lac_prod_growth*(G-lac_prod_mid)))) + (1-lac_prod_max)
     
     
     

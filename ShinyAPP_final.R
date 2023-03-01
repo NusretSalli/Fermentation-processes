@@ -80,6 +80,18 @@ ui <- fluidPage(
                   label = "Lactate production 50% point",
                   min = 10, max = 120, value = 20, step = 1),
       
+      sliderInput(inputId = "n_rate_inhib_max", 
+                  label = "Max N inhibition factor",
+                  min = 0, max = 1, value = 0.8),
+      
+      sliderInput(inputId = "lac_con_max", 
+                  label = "Max lactate consumption factor",
+                  min = 0, max = 1, value = 0.9),
+      
+      sliderInput(inputId = "lac_prod_max", 
+                  label = "Max lactate production factor",
+                  min = 0, max = 1, value = 0.9),
+      
       sliderInput(inputId = "time_end", 
                   label = "time end:",
                   min = 0, max = 100, value = 30),
@@ -139,7 +151,10 @@ server <- function(input, output) {
          "lac_prod_growth" = input$lac_prod_growth,
          "N_rate_inhib_mid" = input$N_rate_inhib_mid,
          "lac_con_mid" = input$lac_con_mid,
-         "lac_prod_mid" = input$lac_prod_mid)
+         "lac_prod_mid" = input$lac_prod_mid,
+         "n_rate_inhib_max" = input$n_rate_inhib_max,
+         "lac_con_max" = input$lac_con_max,
+         "lac_prod_max" = input$lac_prod_max)
     
   })
   
@@ -209,9 +224,12 @@ server <- function(input, output) {
                     "lac_prod_growth",
                     "N_rate_inhib_mid",
                     "lac_con_mid",
-                    "lac_prod_mid")
+                    "lac_prod_mid",
+                    "n_rate_inhib_max",
+                    "lac_con_max",
+                    "lac_prod_max")
     
-    n_iterations <- 100
+    n_iterations <- 500
     
     rate_list <- runif(n_iterations, min = 0.001, max = 0.2)
     
@@ -233,6 +251,12 @@ server <- function(input, output) {
     
     lac_prod_mid_list <- runif(n_iterations, min = 10, max = 120)
     
+    n_rate_inhib_max_list <- runif(n_iterations, min = 0.1, max = 1)
+    
+    lac_con_max_list <- runif(n_iterations, min = 0.1, max = 1)
+    
+    lac_prod_max_list <- runif(n_iterations, min = 0.1, max = 1)
+    
     param_data_frame <- cbind(rate_list,
                               flow_list,
                               G_medium_list,
@@ -242,7 +266,10 @@ server <- function(input, output) {
                               lac_prod_growth_list,
                               N_rate_inhib_mid_list,
                               lac_con_mid_list,
-                              lac_prod_mid_list)
+                              lac_prod_mid_list,
+                              n_rate_inhib_max_list,
+                              lac_con_max_list,
+                              lac_prod_max_list)
     
     results_PRCC <- PRCC_calc(final_model,
                               initial_states(),

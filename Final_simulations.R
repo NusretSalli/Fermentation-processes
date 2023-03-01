@@ -59,6 +59,12 @@ p$lac_con_mid <- 60
 
 p$lac_prod_mid <- 30
 
+p$n_rate_inhib_max <- 0.8
+
+p$lac_con_max <- 0.9
+
+p$lac_prod_max <- 0.75
+
 time <- seq(0,30,0.1)
 
 sol <- ode(x0,time,final_model,p)
@@ -150,7 +156,10 @@ bound_var <- c("rate",
                "lac_prod_growth",
                "N_rate_inhib_mid",
                "lac_con_mid",
-               "lac_prod_mid")
+               "lac_prod_mid",
+               "n_rate_inhib_max",
+               "lac_con_max",
+               "lac_prod_max")
 
 bound_min_var <- c(0.001,
                    0.20,
@@ -161,7 +170,10 @@ bound_min_var <- c(0.001,
                    0.1,
                    10,
                    10,
-                   10)
+                   10,
+                   0.1,
+                   0.1,
+                   0.1)
 
 bound_max_var <- c(0.7,
                    0.95,
@@ -172,12 +184,15 @@ bound_max_var <- c(0.7,
                    2,
                    120,
                    120,
-                   120)
+                   120,
+                   1,
+                   1,
+                   1)
 
 time_val <- c(0.01, seq(0.1,30, by = 0.1))
 
 
-sensitive_sobol_final <- sobol_sensitivity(final_model_sensitivity,
+sensitive_sobol_final <- sobol_sensitivity(final_model_analysis,
                                            bound_var,
                                            x0,
                                            bound_min_var,
@@ -195,7 +210,7 @@ plot(sensitive_sobol_final, pars_plot = bound_var, state_plot = "L", main_title 
 # morris # 
 
 
-sensitive_morris_final <- morris_sensitivity(final_model_sensitivity,
+sensitive_morris_final <- morris_sensitivity(final_model_analysis,
                                              bound_var,
                                              x0,
                                              bound_min_var,
@@ -221,7 +236,10 @@ param_name <- c("rate",
                 "lac_prod_growth",
                 "N_rate_inhib_mid",
                 "lac_con_mid",
-                "lac_prod_mid")
+                "lac_prod_mid",
+                "n_rate_inhib_max",
+                "lac_con_max",
+                "lac_prod_max")
 
 n_iterations <- 1000
 
@@ -245,6 +263,13 @@ lac_con_mid_list <- runif(n_iterations, min = 10, max = 120)
 
 lac_prod_mid_list <- runif(n_iterations, min = 10, max = 120)
 
+n_rate_inhib_max_list <- runif(n_iterations, min = 0.1, max = 1)
+
+lac_con_max_list <- runif(n_iterations, min = 0.1, max = 1)
+
+lac_prod_max_list <- runif(n_iterations, min = 0.1, max = 1)
+
+
 param_data_frame <- cbind(rate_list,
                           flow_list,
                           G_medium_list,
@@ -254,7 +279,10 @@ param_data_frame <- cbind(rate_list,
                           lac_prod_growth_list,
                           N_rate_inhib_mid_list,
                           lac_con_mid_list,
-                          lac_prod_mid_list)
+                          lac_prod_mid_list,
+                          n_rate_inhib_max_list,
+                          lac_con_max_list,
+                          lac_prod_max_list)
 
 results_PRCC <- PRCC_calc(final_model,
                           x0,
