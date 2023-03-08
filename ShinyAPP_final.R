@@ -70,15 +70,15 @@ ui <- fluidPage(
       
       sliderInput(inputId = "N_rate_inhib_mid", 
                   label = "N inhibition 50% point",
-                  min = 10, max = 120, value = 20, step = 1),
+                  min = 10, max = 200, value = 20, step = 1),
       
       sliderInput(inputId = "lac_con_mid", 
                   label = "Lactate consumption 50% point",
-                  min = 10, max = 120, value = 20, step = 1),
+                  min = 10, max = 200, value = 20, step = 1),
       
       sliderInput(inputId = "lac_prod_mid", 
                   label = "Lactate production 50% point",
-                  min = 10, max = 120, value = 20, step = 1),
+                  min = 10, max = 200, value = 20, step = 1),
       
       sliderInput(inputId = "n_rate_inhib_max", 
                   label = "Max N inhibition factor",
