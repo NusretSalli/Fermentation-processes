@@ -19,15 +19,15 @@ require(plotly)
 
 source("Models.R")
 
-source("Phase_analysis.R")
+source("Phase_analysis_func.R")
 
-source("Sensitivity_analysis.R")
+source("Sensitivity_analysis_func.R")
 
 #source("helper functions/3dplot.R")
 
 #source("helper functions/2dplot.R")
 
-source("Parameter_estimation.R")
+source("Parameter_estimation_func.R")
 
 
 ## Initial state
