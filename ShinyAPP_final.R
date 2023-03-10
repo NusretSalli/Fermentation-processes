@@ -12,7 +12,7 @@ require(epiR)
 
 source("Models.R")
 
-source("Sensitivity_analysis.R")
+source("Sensitivity_analysis_func.R")
 
 
 
