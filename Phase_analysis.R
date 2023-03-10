@@ -67,12 +67,11 @@ sol_iter <- ode(x0_state,time,final_model,p)
 
 output <- data.frame(sol_iter)
 
-
 ggplot(data = output, aes(x = N, y = G)) + geom_point(size = 3, color = "blue") + 
   labs(title = "Phase N / G", x = "N", y = "G")
 
 ggplot(data = output, aes(x = N, y = L)) + geom_point(size = 3, color = "blue") + 
-  labs(title = "Phase N / G", x = "N", y = "L")
+  labs(title = "Phase N / L", x = "N", y = "L")
 
 ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") + 
   labs(title = "Phase G / L", x = "G", y = "L")  
