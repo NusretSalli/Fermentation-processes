@@ -55,48 +55,104 @@ sol <- ode(x0,time,final_model,p)
 
 output <- data.frame(sol)
 
+output_matrix <- as.matrix(output)
 
-state_output <- output[,c(2,3,4)]
+output_int <- data.frame(output)
 
-m <- ggplot(state_output, aes(x = N, y = G)) +
+output_int[,c(1,2,3,4)] <- lapply(output[,c(1,2,3,4)], function(x) ceiling(x))
+
+x_grid <- seq(1,max(output_int$N),length.out = length(output$N))
+
+y_grid <- seq(1,max(output_int$G),length.out = length(output$G))
+
+full_grid <- expand.grid(x_grid,y_grid)
+
+
+full_grid$N <- output$N
+
+
+# output[,c(2,3,4)] <- lapply(output[,c(2,3,4)], function(x) ceiling(x))
+
+
+plot_N_G <- ggplot(output, aes(x = N, y = G)) +
   geom_point() +
-  xlim(0, 350) +
-  ylim(0, 400)
-
-# contour lines
-m + geom_density_2d_filled(alpha = 0.5) +
-  geom_density_2d(linewidth = 0.25, colour = "black")
-
-
-N0_list <- runif(1000, 5, 50)
-
-G0_list <- runif(1000, 100, 350)
-
-L0_list <- p$G_medium - N0_list - G0_list
-
-
-x0_state <- c(N = N0_list[1], G = G0_list[1], L = L0_list[1])
+  xlim(-60, 370) +
+  ylim(-50, 470) +
+  stat_density_2d_filled(alpha = 0.5) +
+  stat_density_2d(linewidth = 0.25, colour = "black")
   
-sol_iter <- ode(x0_state,time,final_model,p)
 
-output <- data.frame(sol_iter)
+plot_N_G
 
-ggplot(data = output, aes(x = N, y = G)) + geom_point(size = 3, color = "blue") + 
-  labs(title = "Phase N / G", x = "N", y = "G")
+plot_N_L <- ggplot(output, aes(x = N, y = L)) +
+  geom_point() +
+  xlim(-30, 370) +
+  ylim(-30, 120) +
+  stat_density_2d_filled(alpha = 0.5) +
+  stat_density_2d(linewidth = 0.25, colour = "black")
 
-ggplot(data = output, aes(x = N, y = L)) + geom_point(size = 3, color = "blue") + 
-  labs(title = "Phase N / L", x = "N", y = "L")
+plot_N_L
 
-ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") + 
-  labs(title = "Phase G / L", x = "G", y = "L")  
+plot_G_L <- ggplot(output, aes(x = L, y = G)) +
+  geom_point()+
+  stat_density_2d_filled(alpha=0.5)+
+  stat_density_2d(linewidth = 0.25, colour = "black")
 
-fig <- plot_ly(output, x = ~N, y = ~G, z = ~L, type = 'scatter3d', mode = 'lines',
-               opacity = 1, line = list(width = 6))
-
-fig  
-
-
-
+plot_G_L
 
 
+# N0_list <- runif(1000, 5, 50)
+# 
+# G0_list <- runif(1000, 100, 350)
+# 
+# L0_list <- p$G_medium - N0_list - G0_list
+# 
+# 
+# x0_state <- c(N = N0_list[1], G = G0_list[1], L = L0_list[1])
+#   
+# sol_iter <- ode(x0_state,time,final_model,p)
+# 
+# output <- data.frame(sol_iter)
+# 
+# ggplot(data = output, aes(x = N, y = G)) + geom_point(size = 3, color = "blue") + 
+#   labs(title = "Phase N / G", x = "N", y = "G")
+# 
+# ggplot(data = output, aes(x = N, y = L)) + geom_point(size = 3, color = "blue") + 
+#   labs(title = "Phase N / L", x = "N", y = "L")
+# 
+# ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") + 
+#   labs(title = "Phase G / L", x = "G", y = "L")  
+# 
+# fig <- plot_ly(output, x = ~N, y = ~G, z = ~L, type = 'scatter3d', mode = 'lines',
+#                opacity = 1, line = list(width = 6))
+# 
+# fig  
+
+
+# ##
+# 
+# fig <- plot_ly(
+#   x = seq(0,max(plotly_state_output[,1]),50), 
+#   y = seq(0,max(plotly_state_output[,2]),50),
+#   z = plotly_state_output, 
+#   type = "contour" 
+# )
+# 
+# fig
+
+
+# plotly_state_output <- as.matrix(output[,c(2,3,4)])
+# 
+# fig <- plot_ly(z = ~plotly_state_output, type = "contour")
+# 
+# fig
+
+# fig <- plot_ly(
+#   x = seq(0,max(output_matrix[,4]),10), 
+#   y = seq(0,max(output_matrix[,3]),10),
+#   z = output_matrix[,c(3,4)], 
+#   type = "contour" 
+# )
+# 
+# fig
 
