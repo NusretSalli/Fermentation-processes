@@ -6,6 +6,8 @@ require(deSolve)
 
 require(ggplot2)
 
+require(MASS)
+
 source("Phase_analysis_func.R")
 
 source("Models.R")
@@ -52,6 +54,19 @@ time <- seq(0,30,0.1)
 sol <- ode(x0,time,final_model,p)
 
 output <- data.frame(sol)
+
+
+state_output <- output[,c(2,3,4)]
+
+m <- ggplot(state_output, aes(x = N, y = G)) +
+  geom_point() +
+  xlim(0, 350) +
+  ylim(0, 400)
+
+m
+
+# contour lines
+m + geom_density_2d_filled()
 
 
 N0_list <- runif(1000, 5, 50)
