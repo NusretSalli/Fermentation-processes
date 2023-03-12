@@ -63,10 +63,9 @@ m <- ggplot(state_output, aes(x = N, y = G)) +
   xlim(0, 350) +
   ylim(0, 400)
 
-m
-
 # contour lines
-m + geom_density_2d_filled()
+m + geom_density_2d_filled(alpha = 0.5) +
+  geom_density_2d(linewidth = 0.25, colour = "black")
 
 
 N0_list <- runif(1000, 5, 50)
