@@ -67,6 +67,8 @@ y_grid <- seq(min(output_int$G),max(output_int$G),length.out = length(output$L))
 
 
 
+
+
 ## WHAT UFFE WANTS ##
 
 ggplot(data = output, aes(x = N, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
