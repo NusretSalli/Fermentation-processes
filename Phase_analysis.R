@@ -109,6 +109,7 @@ ggplot(data = output_list, aes(x = G, y = L)) + geom_point(size = 3, color = "bl
 
 
 
+## Trying to make contour plots need to get L-data for all N / G combination
 
 full_grid <- expand.grid(x_grid,y_grid)
 
