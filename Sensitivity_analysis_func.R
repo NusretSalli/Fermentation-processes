@@ -192,7 +192,7 @@ morris_sensitivity <- function(model, var_pars, x0_init, var_min, var_max, time_
             r = 2000, # number of "iterations"
             design = list(type = "oat", # oat = one at a time
                           levels = 10,
-                          grid.jump =1),
+                          grid.jump =1), # grid jump should be levels / 2
             scale = TRUE,
             ode_method = "lsoda", # which ode-solver that will be used
             parallel_eval = TRUE, # parallel evaluation? Yes or no?

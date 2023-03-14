@@ -217,6 +217,7 @@ sensitive_morris_final <- morris_sensitivity(final_model_analysis,
                                              bound_max_var,
                                              time_val)
 
+
 plot(sensitive_morris_final, pars_plot = bound_var, state_plot = "N", kind = "sep", main_title = "N sensitivity - Morris", type = "l")
 
 plot(sensitive_morris_final, pars_plot = bound_var, state_plot = "G", kind = "sep", main_title = "G sensitivity - Morris", type = "l")
