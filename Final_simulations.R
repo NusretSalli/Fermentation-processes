@@ -13,6 +13,8 @@ require(ODEsensitivity)
 
 require(epiR)
 
+require(FME)
+
 require(dplyr)
 
 require(plotly)
@@ -375,17 +377,18 @@ new_param <- c(rate = 0.6,
                lac_con_mid = 60,
                lac_prod_mid = 50)
 
-output_real <- ode(init,time,final_model_estimation,new_param)
+sol_real <- ode(init,time,final_model_estimation,new_param)
 
+output_real <- data.frame(sol_real)
 
-modcost_test <- modCost(output_est,output_real, x = "time")
+modcost_test <- modCost(output_est,sol_real, x = "time")
 
 
 error_functional_test <- function(param){
   
   est <- ode(init,time,final_model_estimation,param)
   
-  return(modCost(est,output_real, x = "time"))
+  return(modCost(est,sol_real, x = "time"))
   
   
 }
@@ -420,10 +423,10 @@ fit <- modFit(error_functional_test,
               method = "Pseudo")
 
 
-output_estimated <- ode(init, time, final_model_estimation,fit$par)
+sol_estimated <- ode(init, time, final_model_estimation,fit$par)
 
-fit$ssr
- 
-  
+output_estimated <- data.frame(sol_estimated)
+
+fit
   
   
