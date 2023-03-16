@@ -86,5 +86,54 @@ phase_plan_analysis <- function(model, xrange, yrange, t_stop = 300, param_list,
 }
 
 
+phase_plane_plot_all <- function(n_iterations){
+  
+  
+  
+  N0_list <- runif(n_iterations, min = 1, max = 60)
+  
+  G0_list <- runif(n_iterations, min = 200, max = 340)
+  
+  L0_list <- p$G_medium - N0_list - G0_list
+  
+  for (i in 1:n_iterations){
+    
+    x0_list <- c(N = N0_list[i], G = G0_list[i], L = L0_list[i])
+    
+    sol_list <- ode(x0_list,time,final_model,p)
+    
+    
+    if (i == 1){
+      
+      output_final_list <- data.frame(sol_list)
+      
+      sim_number <- c(rep(i,length(time)))
+      
+    } else {
+      
+      next_sim <- rep(i,length(time))
+      
+      sim_number <- c(sim_number,next_sim)
+      
+      output_list <- data.frame(sol_list)
+      
+      output_final_list <- rbind(output_final_list,output_list)
+      
+    }
+    
+  }
+  
+  output_total <- cbind(output_final_list, sim_number)
+  
+  return(output_total)
+  
+}
+
+
+
+
+
+
+
 
 

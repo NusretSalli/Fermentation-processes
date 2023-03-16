@@ -82,13 +82,42 @@ ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") 
 
 # when doing with different initial values #
 
-N0_list <- runif(10, min = 5, max = 50)
+n_iterations <- 10
 
-G0_list <- runif(10, min = 200, max = 350)
+N0_list <- runif(n_iterations, min = 1, max = 60)
+
+G0_list <- runif(n_iterations, min = 200, max = 340)
 
 L0_list <- p$G_medium - N0_list - G0_list
 
-x0_list <- c(N = N0_list[3], G = G0_list[3], L = L0_list[3])
+
+for (i in 1:n_iterations){
+  
+  x0_list <- c(N = N0_list[i], G = G0_list[i], L = L0_list[i])
+  
+  sol_list <- ode(x0_list,time,final_model,p)
+  
+  if (i == 1){
+    
+    output_final_list <- data.frame(sol_list)
+    
+  }
+  
+  output_list <- data.frame(sol_list)
+  
+  output_final_list <- rbind(output_final_list,output_list)
+  
+}
+
+run <- rep(c(rep(1, 301), rep(2, 301), rep(3, 301), rep(4, 301), rep(5,301), rep(6,301),rep(7,301),rep(8,301),rep(9,301),rep(10,301),rep(11,301)))
+
+output_final_final_list <- cbind(output_final_list, run)
+
+
+output_compare <- phase_plane_plot_all(n_iterations)
+
+ggplot(data = output_compare, aes(x = N, y = G)) + geom_point(size = 3, color =) +
+  labs(title = "NG phaseplot", x = "N", y = "G")
 
 
 sol_list <- ode(x0_list,time,final_model,p)
