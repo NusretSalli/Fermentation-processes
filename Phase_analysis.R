@@ -82,42 +82,23 @@ ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") 
 
 # when doing with different initial values #
 
-n_iterations <- 10
-
-N0_list <- runif(n_iterations, min = 1, max = 60)
-
-G0_list <- runif(n_iterations, min = 200, max = 340)
-
-L0_list <- p$G_medium - N0_list - G0_list
+n_iterations <- 1000
 
 
-for (i in 1:n_iterations){
-  
-  x0_list <- c(N = N0_list[i], G = G0_list[i], L = L0_list[i])
-  
-  sol_list <- ode(x0_list,time,final_model,p)
-  
-  if (i == 1){
-    
-    output_final_list <- data.frame(sol_list)
-    
-  }
-  
-  output_list <- data.frame(sol_list)
-  
-  output_final_list <- rbind(output_final_list,output_list)
-  
-}
+output_compare <- phase_plane_data(n_iterations)
 
-run <- rep(c(rep(1, 301), rep(2, 301), rep(3, 301), rep(4, 301), rep(5,301), rep(6,301),rep(7,301),rep(8,301),rep(9,301),rep(10,301),rep(11,301)))
+ggplot(data = output_compare, aes(x = N, y = G)) + geom_point(aes(color = sim_number),size = 1) +
+  labs(title = "NG phaseplot", x = "N", y = "G")+
+  scale_color_gradientn(colours = rainbow(10))
 
-output_final_final_list <- cbind(output_final_list, run)
+ggplot(data = output_compare, aes(x = N, y = L)) + geom_point(aes(color = sim_number),size = 1) +
+  labs(title = "NL phaseplot from 50 simulations", x = "N", y = "L")+
+  scale_color_gradientn(colours = rainbow(10))
 
+ggplot(data = output_compare, aes(x = G, y = L)) + geom_point(aes(color = sim_number),size = 1) +
+  labs(title = "GL phaseplot", x = "G", y = "L")+
+  scale_color_gradientn(colours = rainbow(10))
 
-output_compare <- phase_plane_plot_all(n_iterations)
-
-ggplot(data = output_compare, aes(x = N, y = G)) + geom_point(size = 3, color =) +
-  labs(title = "NG phaseplot", x = "N", y = "G")
 
 
 sol_list <- ode(x0_list,time,final_model,p)

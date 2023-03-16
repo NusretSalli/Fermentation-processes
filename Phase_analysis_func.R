@@ -86,13 +86,12 @@ phase_plan_analysis <- function(model, xrange, yrange, t_stop = 300, param_list,
 }
 
 
-phase_plane_plot_all <- function(n_iterations){
-  
+phase_plane_data <- function(n_iterations){
   
   
   N0_list <- runif(n_iterations, min = 1, max = 60)
   
-  G0_list <- runif(n_iterations, min = 200, max = 340)
+  G0_list <- runif(n_iterations, min = 1, max = 340)
   
   L0_list <- p$G_medium - N0_list - G0_list
   
@@ -124,6 +123,7 @@ phase_plane_plot_all <- function(n_iterations){
   }
   
   output_total <- cbind(output_final_list, sim_number)
+  
   
   return(output_total)
   
