@@ -55,18 +55,6 @@ sol <- ode(x0,time,final_model,p)
 
 output <- data.frame(sol)
 
-output_matrix <- as.matrix(output)
-
-output_int <- data.frame(output)
-
-output_int[,c(1,2,3,4)] <- lapply(output[,c(1,2,3,4)], function(x) ceiling(x))
-
-x_grid <- seq(min(output_int$G),max(output_int$N),length.out = length(output$L))
-
-y_grid <- seq(min(output_int$G),max(output_int$G),length.out = length(output$L))
-
-
-
 ## WHAT UFFE WANTS ##
 
 ggplot(data = output, aes(x = N, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
@@ -82,56 +70,22 @@ ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") 
 
 # when doing with different initial values #
 
-n_iterations <- 1000
+n_iterations <- 200
 
 
-output_compare <- phase_plane_data(n_iterations)
+output_simulation <- phase_plane_data(n_iterations)
 
-ggplot(data = output_compare, aes(x = N, y = G)) + geom_point(aes(color = sim_number),size = 1) +
+ggplot(data = output_simulation, aes(x = N, y = G)) + geom_point(aes(color = sim_number),size = 1) +
   labs(title = "NG phaseplot", x = "N", y = "G")+
   scale_color_gradientn(colours = rainbow(10))
 
-ggplot(data = output_compare, aes(x = N, y = L)) + geom_point(aes(color = sim_number),size = 1) +
+ggplot(data = output_simulation, aes(x = N, y = L)) + geom_point(aes(color = sim_number),size = 1) +
   labs(title = "NL phaseplot from 50 simulations", x = "N", y = "L")+
   scale_color_gradientn(colours = rainbow(10))
 
-ggplot(data = output_compare, aes(x = G, y = L)) + geom_point(aes(color = sim_number),size = 1) +
+ggplot(data = output_simulation, aes(x = G, y = L)) + geom_point(aes(color = sim_number),size = 1) +
   labs(title = "GL phaseplot", x = "G", y = "L")+
   scale_color_gradientn(colours = rainbow(10))
-
-
-
-sol_list <- ode(x0_list,time,final_model,p)
-
-output_list <- data.frame(sol_list)
-
-ggplot(data = output_list, aes(x = N, y = G)) + geom_point(size = 3, color = "blue") +
-  labs(title = "NG phaseplot", x = "N", y = "G")
-
-
-ggplot(data = output_list, aes(x = N, y = L)) + geom_point(size = 3, color = "blue") + 
-  labs(title = "NL phaseplot", x = "N", y = "L")
-
-ggplot(data = output_list, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") + 
-  labs(title = "GL phaseplot", x = "G", y = "L")
-
-
-
-## Trying to make contour plots need to get L-data for all N / G combination
-
-full_grid <- expand.grid(x_grid,y_grid)
-
-
-full_grid$L <- output_int$L
-
-
-# output[,c(2,3,4)] <- lapply(output[,c(2,3,4)], function(x) ceiling(x))
-
-plot1 <- ggplot(full_grid, aes(x = Var1, y = Var2, z = L)) +
-  geom_contour_filled()
-
-
-plot1
 
 
 
