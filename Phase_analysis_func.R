@@ -89,15 +89,24 @@ phase_plan_analysis <- function(model, xrange, yrange, t_stop = 300, param_list,
 phase_plane_data <- function(n_iterations){
   
   
-  N0_list <- runif(n_iterations, min = 1, max = 60)
-  
-  G0_list <- runif(n_iterations, min = 1, max = 340)
-  
-  L0_list <- p$G_medium - N0_list - G0_list
+  # N0_list <- runif(n_iterations, min = 1, max = 60)
+  # 
+  # G0_list <- runif(n_iterations, min = 1, max = 340)
+  # 
+  # L0_list <- p$G_medium - N0_list - G0_list
   
   for (i in 1:n_iterations){
     
-    x0_list <- c(N = N0_list[i], G = G0_list[i], L = L0_list[i])
+    N0_ran <- runif(1, min = 1, max = p$G_medium)
+    
+    left_N0 <- p$G_medium - N0_ran
+    
+    G0_ran <- runif(1, min = 1, max = left_N0)
+    
+    L0_ran <- left_N0 - G0_ran
+    
+    
+    x0_list <- c(N = N0_ran, G = G0_ran, L = L0_ran)
     
     sol_list <- ode(x0_list,time,final_model,p)
     
@@ -106,13 +115,13 @@ phase_plane_data <- function(n_iterations){
       
       output_final_list <- data.frame(sol_list)
       
-      sim_number <- c(rep(i,length(time)))
+      N0_value <- c(rep(N0_ran,length(time)))
       
     } else {
       
-      next_sim <- rep(i,length(time))
+      next_sim <- rep(N0_ran,length(time))
       
-      sim_number <- c(sim_number,next_sim)
+      N0_value <- c(N0_value,next_sim)
       
       output_list <- data.frame(sol_list)
       
@@ -122,7 +131,7 @@ phase_plane_data <- function(n_iterations){
     
   }
   
-  output_total <- cbind(output_final_list, sim_number)
+  output_total <- cbind(output_final_list, N0_value)
   
   
   return(output_total)

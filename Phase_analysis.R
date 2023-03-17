@@ -70,25 +70,28 @@ ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") 
 
 # when doing with different initial values #
 
-n_iterations <- 200
+n_iterations <- 600
 
 
 output_simulation <- phase_plane_data(n_iterations)
 
-ggplot(data = output_simulation, aes(x = N, y = G)) + geom_point(aes(color = sim_number),size = 1) +
-  labs(title = "NG phaseplot", x = "N", y = "G")+
+ggplot(data = output_simulation, aes(x = N, y = G)) + geom_point(aes(color = N0_value),size = 1.2) +
+  labs(title = "NG phaseplot from 600 simulations", x = "N", y = "G")+
+  scale_color_gradientn(colours = rainbow(100))
+
+ggplot(data = output_simulation, aes(x = N, y = L)) + geom_point(aes(color = N0_value),size = 1) +
+  labs(title = "NL phaseplot from 600 simulations", x = "N", y = "L")+
+  scale_color_gradientn(colours = rainbow(100))
+
+ggplot(data = output_simulation, aes(x = G, y = L)) + geom_point(aes(color = N0_value),size = 1) +
+  labs(title = "GL phaseplot  from 600 simulations", x = "G", y = "L")+
   scale_color_gradientn(colours = rainbow(10))
 
-ggplot(data = output_simulation, aes(x = N, y = L)) + geom_point(aes(color = sim_number),size = 1) +
-  labs(title = "NL phaseplot from 50 simulations", x = "N", y = "L")+
-  scale_color_gradientn(colours = rainbow(10))
 
-ggplot(data = output_simulation, aes(x = G, y = L)) + geom_point(aes(color = sim_number),size = 1) +
-  labs(title = "GL phaseplot", x = "G", y = "L")+
-  scale_color_gradientn(colours = rainbow(10))
+fig <- plot_ly(output_simulation, x = ~N, y = ~G, z = ~L, type = 'scatter3d', mode = 'point',
+               color = output_simulation$N0_value,opacity = 1)
 
-
-
+fig
 
 
 # 
