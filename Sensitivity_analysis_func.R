@@ -332,38 +332,64 @@ PRCC_plot <- function(PRCC_data, status){
 }
 
 
+param_simulator <- function(param_lower, param_upper,param_list,param_name_list,param_index, n_iterations){
+  
+  parameter_list <- list()
+  
+  for (i in 1:n_iterations){
+    
+    param_ran <- runif(1, min = param_lower, max = param_upper)
+    
+    
+    for (l in 1:length(param_name)){
+      
+      if (l == param_index){
+        
+        parameter_list[l] <- param_ran
+        
+      } else {
+        
+        parameter_list[l] <- param_list[[l]]
+        
+      }
+      
+    }
+    
+    
+    names(parameter_list) <- param_name_list
+    
+    sol <- ode(x0,time,final_protein_model,parameter_list)
+    
+    if (i == 1){
+      
+      output_final_list <- data.frame(sol)
+      
+      parameter <- c(rep(param_ran,length(time)))
+      
+    } else {
+      
+      parameter_conc <- rep(param_ran,length(time))
+      
+      parameter <- c(parameter, parameter_conc)
+      
+      output_list <- data.frame(sol)
+      
+      output_final_list <- rbind(output_final_list,output_list)
+      
+      
+    }
+    
+    
+  }
+  
+  output_total <- cbind(output_final_list, parameter)
+  
+  colnames(output_total)[ncol(output_total)] <- param_name_list[param_index]
+  
+  return(output_total)
+  
+}
 
-# N_end <- numeric(n_iterations)
-# 
-# G_end <- numeric(n_iterations)
-# 
-# for ( i in 1:n_iterations){
-#   
-#   # simulate the differential equations and solve them
-#   
-#   parameter_list <- list()
-#   
-#   parameter_list$rate <- rate[i]
-#   
-#   parameter_list$flow <- flow[i]
-#   
-#   parameter_list$G_medium <- G_medium[i]
-#   
-#   output <- ode(x0_base,time,base_model,parameter_list)
-#   
-#   N_end[i] <- mean(tail(output[,"N"],n=3))
-#   
-#   G_end[i] <- mean(tail(output[,"G"],n=3))
-#   
-#   
-#   
-# }
-# 
-# 
-# sim_result <- data.frame(rate = rate,
-#                          flow = flow,
-#                          G_medium = G_medium,
-#                          N_end,
-#                          G_end)
+
 
 
