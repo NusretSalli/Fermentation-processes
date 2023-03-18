@@ -336,12 +336,16 @@ param_simulator <- function(param_lower, param_upper,param_list,param_name_list,
   
   parameter_list <- list()
   
+  param_ran_list <- seq(from = param_lower, to = param_upper, length.out = n_iterations)
+  
   for (i in 1:n_iterations){
     
-    param_ran <- runif(1, min = param_lower, max = param_upper)
+    #param_ran <- runif(1, min = param_lower, max = param_upper)
+    
+    param_ran <- param_ran_list[i]
     
     
-    for (l in 1:length(param_name)){
+    for (l in 1:length(param_list)){
       
       if (l == param_index){
         
@@ -387,6 +391,47 @@ param_simulator <- function(param_lower, param_upper,param_list,param_name_list,
   colnames(output_total)[ncol(output_total)] <- param_name_list[param_index]
   
   return(output_total)
+  
+}
+
+
+param_simulator_plotter <- function(param_lower_list,
+                                    param_upper_list,
+                                    param_list,
+                                    param_name_list,
+                                    n_iterations){
+  
+  for (i in 1:length(param_name_list)){
+    
+    output_iter <- param_simulator(param_lower = param_lower_list[i],
+                                   param_upper = param_upper_list[i],
+                                   param_list,
+                                   param_name_list,
+                                   param_index = i,
+                                   n_iterations)
+    
+    #par(mfrow=c(2,2))
+    
+    plot1 <- ggplot(data = output_iter, aes(x = time, y = P)) + geom_point(aes(color = param_name_list[i]),size = 1) +
+      labs(title = "Process optimization", x = "time", y = "P")+
+      scale_color_gradientn(colours = rainbow(10))
+    
+    plot2 <- ggplot(data = output_iter, aes(x = time, y = N)) + geom_point(aes(color = param_name_list[i]),size = 1) +
+      labs(title = "Process optimization", x = "time", y = "N")+
+      scale_color_gradientn(colours = rainbow(10))
+    
+    plot3 <- ggplot(data = output_iter, aes(x = time, y = G)) + geom_point(aes(color = param_name_list[i]),size = 1) +
+      labs(title = "Process optimization", x = "time", y = "G")+
+      scale_color_gradientn(colours = rainbow(10))
+    
+    plot4 <- ggplot(data = output_iter, aes(x = time, y = L)) + geom_point(aes(color = param_name_list[i]),size = 1) +
+      labs(title = "Process optimization", x = "time", y = "N")+
+      scale_color_gradientn(colours = rainbow(10))
+    
+    ggarrange(plot1, plot2, plot3, plot4, ncol = 2, nrow = 2, align = 'h')
+    
+  }
+  
   
 }
 

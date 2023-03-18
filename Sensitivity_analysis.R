@@ -9,6 +9,10 @@ require(ODEsensitivity)
 
 require(epiR)
 
+require(ggplot2)
+
+require(ggpubr)
+
 source("Models.R")
 
 source("Phase_analysis_func.R")
@@ -277,12 +281,72 @@ param_name <- c("rate",
                 "epsilon")
 
 
-param_optim_output <- param_simulator(param_lower, param_upper, p, param_name, 14, 20)
+param_optim_output <- param_simulator(param_lower, param_upper, p, param_name, 2, 20)
 
 
-ggplot(data = param_optim_output, aes(x = time, y = P)) + geom_point(aes(color = epsilon),size = 0.6) +
+ggplot(data = param_optim_output, aes(x = time, y = P)) + geom_point(aes(color = flow),size = 1) +
   labs(title = "Process optimization", x = "time", y = "P")+
   scale_color_gradientn(colours = rainbow(10))
+
+ggplot(data = param_optim_output, aes(x = time, y = N)) + geom_point(aes(color = flow),size = 1) +
+  labs(title = "Process optimization", x = "time", y = "N")+
+  scale_color_gradientn(colours = rainbow(10))
+
+ggplot(data = param_optim_output, aes(x = time, y = G)) + geom_point(aes(color = flow),size = 1) +
+  labs(title = "Process optimization", x = "time", y = "G")+
+  scale_color_gradientn(colours = rainbow(10))
+
+ggplot(data = param_optim_output, aes(x = time, y = L)) + geom_point(aes(color = flow),size = 1) +
+  labs(title = "Process optimization", x = "time", y = "N")+
+  scale_color_gradientn(colours = rainbow(10))
+
+
+##### 
+
+# simulating all of them! 
+
+param_lower_list <- c(0.01, # rate
+                      0.4, # flow
+                      200, # G_medium
+                      10, # G50
+                      0.1, # N_rate_inhib_growth
+                      0.1, # lac_con_growth
+                      0.1, # lac_prod_growth
+                      40, # N_rate_inhib_mid
+                      40, # lac_con_mid
+                      40, # lac_prod_mid
+                      0.5, # n_rate_inhib_max
+                      0.5, # lac_con_max
+                      0.5, # lac_prod_max
+                      0.4) # epsilon
+
+param_upper_list <- c(0.4, # rate
+                      0.90, # flow
+                      600, # G_medium
+                      100, # G50
+                      1, # N_rate_inhib_growth
+                      1, # lac_con_growth
+                      1, # lac_prod_growth
+                      220, # N_rate_inhib_mid
+                      220, # lac_con_mid
+                      220, # lac_prod_mid
+                      1, # n_rate_inhib_max
+                      1, # lac_con_max
+                      1, # lac_prod_max
+                      0.99) # epsilon
+
+
+param_simulator_plotter(param_lower_list, param_upper_list, p, param_name, 20)
+
+
+
+
+
+
+
+
+
+
 
 
 
