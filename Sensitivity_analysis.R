@@ -336,7 +336,19 @@ param_upper_list <- c(0.4, # rate
                       0.99) # epsilon
 
 
-param_simulator_plotter(param_lower_list, param_upper_list, p, param_name, 20)
+result <- param_simulator_plotter(param_lower_list, param_upper_list, p, param_name, 30)
+
+result[["G50"]]
+
+# show the plot by typing result[["name of the variable"]]
+
+
+## Contour plot optimization ##
+
+
+
+
+
 
 
 
