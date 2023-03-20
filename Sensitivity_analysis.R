@@ -338,7 +338,8 @@ param_upper_list <- c(0.4, # rate
 
 result <- param_simulator_plotter(param_lower_list, param_upper_list, p, param_name, 30)
 
-result[["G50"]]
+result[["epsilon"]]
+
 
 # show the plot by typing result[["name of the variable"]]
 
