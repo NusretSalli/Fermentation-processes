@@ -235,7 +235,7 @@ final_protein_model <- function(t,x,p)
          
          dL <- N * lac_prod - flow * L - N * L * lac_con
          
-         dP <- (1-epsilon) * N
+         dP <- (1-epsilon) * (rate * N * G / (1 + G / G50) * N_rate_inhib + N * L * lac_con)
          
          
          return(list(c(dN, dG, dL, dP), c(N_rate_inhib = N_rate_inhib, lac_con = lac_con, lac_prod = lac_prod)))
