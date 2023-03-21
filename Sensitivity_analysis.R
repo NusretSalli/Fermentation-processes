@@ -35,6 +35,7 @@ bound_var <- c("rate",
                "lac_con_max",
                "lac_prod_max")
 
+
 bound_min_var <- c(0.001,
                    0.20,
                    50,
@@ -71,6 +72,36 @@ L0 <- 0
 
 x0 <- c(N = N0, G = G0, L = L0)
 
+p <- list()
+
+p$rate <- 0.1
+
+p$flow <- 0.75 # this shouldn't change from 0.75
+
+p$G_medium <- 400
+
+p$G50 <- 50
+
+p$N_rate_inhib_growth <- 0.2
+
+p$lac_con_growth <- 0.2
+
+p$lac_prod_growth <- 0.2
+
+p$N_rate_inhib_mid <- 50
+
+p$lac_con_mid <- 60
+
+p$lac_prod_mid <- 30
+
+p$n_rate_inhib_max <- 0.8
+
+p$lac_con_max <- 0.9
+
+p$lac_prod_max <- 0.75
+
+time <- seq(0,30,0.1)
+
 
 sensitive_sobol_final <- sobol_sensitivity(final_model_analysis,
                                            bound_var,
@@ -80,11 +111,11 @@ sensitive_sobol_final <- sobol_sensitivity(final_model_analysis,
                                            time_val)
 
 
-plot(sensitive_sobol_final, pars_plot = bound_var, state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 2)
+plot(sensitive_sobol_final, pars_plot = bound_var[1:4], state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 3)
 
-plot(sensitive_sobol_final, pars_plot = bound_var, state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 2)
+plot(sensitive_sobol_final, pars_plot = bound_var[1:4], state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 3)
 
-plot(sensitive_sobol_final, pars_plot = bound_var, state_plot = "L", main_title = "L sensitivity - SOBOL", type = "l", lwd = 2)
+plot(sensitive_sobol_final, pars_plot = bound_var[1:4], state_plot = "L", main_title = "L sensitivity - SOBOL", type = "l", lwd = 3)
 
 
 # morris # 
@@ -98,11 +129,11 @@ sensitive_morris_final <- morris_sensitivity(final_model_analysis,
                                              time_val)
 
 
-plot(sensitive_morris_final, pars_plot = bound_var, state_plot = "N", kind = "sep", main_title = "N sensitivity - Morris", type = "l")
+plot(sensitive_morris_final, pars_plot = bound_var[1:4], state_plot = "N", kind = "sep", main_title = "N sensitivity - Morris", type = "l")
 
-plot(sensitive_morris_final, pars_plot = bound_var, state_plot = "G", kind = "sep", main_title = "G sensitivity - Morris", type = "l")
+plot(sensitive_morris_final, pars_plot = bound_var[1:4], state_plot = "G", kind = "sep", main_title = "G sensitivity - Morris", type = "l")
 
-plot(sensitive_morris_final, pars_plot = bound_var, state_plot = "L", kind = "sep", main_title = "L sensitivity - Morris", type = "l")
+plot(sensitive_morris_final, pars_plot = bound_var[1:4], state_plot = "L", kind = "sep", main_title = "L sensitivity - Morris", type = "l")
 
 # PRCC #
 
