@@ -422,11 +422,39 @@ fit <- modFit(error_functional_test,
               upper = bound_max_var,
               method = "Pseudo")
 
-
 sol_estimated <- ode(init, time, final_model_estimation,fit$par)
 
 output_estimated <- data.frame(sol_estimated)
 
 fit
+
+ggplot(data = output_real, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+  labs(title = "Number of cells", x = "time", y = "number of cells")
+
+ggplot(data = output_real, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+  labs(title = "Glucose levels", x = "time", y = "glucose levels") + 
+  ylim(0, max(output$G)+5)
+
+ggplot(data = output_real, aes(x = time, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+  labs(title = "Lactate levels", x = "time", y = "Lactate") + 
+  ylim(0, max(output$L)+5)
+
+ggplot(data = output_estimated, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+  labs(title = "Number of cells", x = "time", y = "number of cells")
+
+ggplot(data = output_estimated, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+  labs(title = "Glucose levels", x = "time", y = "glucose levels") + 
+  ylim(0, max(output$G)+5)
+
+ggplot(data = output_estimated, aes(x = time, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+  labs(title = "Lactate levels", x = "time", y = "Lactate") + 
+  ylim(0, max(output$L)+5)
+
+
+
+
+
+
+
   
   
