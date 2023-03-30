@@ -433,7 +433,7 @@ ggplot(data = output_real, aes(x = time, y = N)) + geom_point(size = 3, color = 
 
 ggplot(data = output_real, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
   labs(title = "Glucose levels", x = "time", y = "glucose levels") + 
-  ylim(0, max(output$G)+5)
+  ylim(0, max(output_real$G)+5)
 
 ggplot(data = output_real, aes(x = time, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
   labs(title = "Lactate levels", x = "time", y = "Lactate") + 
