@@ -20,6 +20,8 @@ require(dplyr)
 
 require(plotly)
 
+require(minpack.lm)
+
 source("Models.R")
 
 source("Parameter_estimation_func.R")
@@ -173,13 +175,20 @@ sol_real <- ode(init,time,final_model_estimation,new_param)
 output_real <- data.frame(sol_real)
 
 
+
+# function that solves the model given the parameters as input
+
 solve_model <- function(pars) {
   
   # initial values
   
   state <- c(N = N0, G = G0, L = L0)
   
+  # time vector
+  
   time <- seq(0,30,0.1)
+  
+  # store the output and returning it
   
   output <- ode(y = state, time, final_model_estimation, parms = pars)
   
@@ -187,20 +196,28 @@ solve_model <- function(pars) {
 }
 
 
+
+# our objective function given the parameters
+
 objective_func <- function(x, parset = names(x)) {
+  
+  # we substitute the parameter values with x ()
   
   parameters[parset] <- x
   
-  output <- solve_model(parameters)
+  output <- solve_model(parameters) # solving the model
   
-  modCost(output, output_real, x = "time")
+  modCost(output, output_real, x = "time") # calculating the loss
   
 }
 
+# parameters to fit 
 
-param_to_fit <- c(rate = 0.01,
-                  flow = 0.60,
-                  G_medium = 300)
+param_to_fit <- c(rate = 0.7,
+                  flow = 0.21,
+                  G_medium = 60)
+
+# the minimum and maximum range in which the fit takes place
 
 bound_min_var <- c(0.001,
                    0.20,
@@ -210,17 +227,15 @@ bound_max_var <- c(0.7,
                    0.95,
                    1000)
 
+# fitting the model
+
+# good optim algorithms -> bobyqa, pseduo, L-BFGS-B
 
 fit <- modFit(objective_func,
               p = param_to_fit,
               lower = bound_min_var,
               upper = bound_max_var,
-              method = "Marq",
-              control = list(
-                maxiter = 400,
-                ftol = 1e-06,
-                ptol = 1e-06,
-                gtol = 1e-06))
+              method = "L-BFGS-B")
 
 fit
 
