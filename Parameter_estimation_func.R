@@ -13,7 +13,6 @@ final_model_estimation <- function(t,x,p){
     lac_prod <- (1 / (1 + exp(-lac_prod_growth*(G-lac_prod_mid))))
     
     
-    
     dN <- rate * N * G / (1 + G / G50) * N_rate_inhib + N * L * lac_con - flow * N
     
     dG <- - rate * N * G / (1 + G / G50) * N_rate_inhib + flow * (G_medium - G) - N * lac_prod
