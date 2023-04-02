@@ -28,6 +28,24 @@ final_model_estimation <- function(t,x,p){
 }
 
 
+add_noise <- function(real_data, mean_val, sd_val){
+  
+  nrow <- dim(real_data)[1]
+  
+  ncol <- dim(real_data)[2]
+  
+  noise <- matrix(rnorm(nrow * (ncol-1), mean = mean_val, sd = sd_val), ncol = ncol-1)
+  
+  noised_data <- real_data[,2:ncol] + noise
+  
+  real_data[,2:ncol] <- noised_data
+  
+  return(real_data)
+  
+}
+
+
+
 
 
 
