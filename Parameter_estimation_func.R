@@ -108,28 +108,93 @@ stochastic_estimation <- function(model, initial, parameters,param_name, time_in
 }
 
 
-fit_simulation <- function(objective_func, real_data, param_to_fit, bound_min_var, bound_max_var, n_simulations){
+## PARAMTER SIMULATION FUNCTIONS ##
+
+
+solve_model <- function(pars) {
+  
+  # initial values
+  
+  state <- c(N = N0, G = G0, L = L0)
+  
+  # time vector
+  
+  time <- seq(0,30,0.1)
+  
+  # store the output and returning it
+  
+  output <- ode(y = state, time, final_model_estimation, parms = pars)
+  
+  return(output)
+}
+
+
+fit_simulation<- function(objective_func,
+                          real_data,
+                          param_to_fit,
+                          bound_min_var,
+                          bound_max_var,
+                          n_simulations){
   
   
-  for (i in 1:n_simulations){
+  ssr_vec <- numeric(n_simulations)
+  
+  pb <- txtProgressBar(min = 0,      # Minimum value of the progress bar
+                       max = n_simulations, # Maximum value of the progress bar
+                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
+                       width = 50,   # Progress bar width. Defaults to getOption("width")
+                       char = "=")   # Character used to create the bar
+  
+  parameters_data_frame <- data.frame(matrix(NA, nrow = n_simulations, ncol = length(param_to_fit)))
+  
+  colnames(parameters_data_frame) <- names(param_to_fit)
+  
+  objective_func_sim <- function(x, noised_data, parset = names(x)) {
     
-    noised_data <- add_noise(real_data, mean = 12, sd = 6)
+    # we substitute the parameter values with x ()
     
-    fit <- modFit(objective_func,
-                  p = param_to_fit,
-                  lower = bound_min_var,
-                  upper = bound_max_var,
-                  method = "L-BFGS-B") 
+    parameters[parset] <- x
+    
+    output <- solve_model(parameters) # solving the model
+    
+    modCost(output, noised_data, x = "time") # calculating the loss
     
   }
   
   
+  for (i in 1:n_simulations){
+    
+    noised_data <- add_noise(real_data, mean = 10, sd = 5)
+    
+    fit <- modFit(objective_func_sim,
+                  p = param_to_fit,
+                  lower = bound_min_var,
+                  upper = bound_max_var,
+                  method = "L-BFGS-B",
+                  noised_data = noised_data)
+    
+    if (i == 1){
+      
+      parameters_data_frame[i,] <- fit$par
+      
+      ssr_vec[i] <- fit$ssr
+      
+    } else {
+      
+      parameters_data_frame[i,] <- fit$par
+      
+      ssr_vec[i] <- fit$ssr
+      
+    }
+    
+    # progress bar
+    setTxtProgressBar(pb, i)
+    
+  }
   
+  return(list(parameters_data_frame, ssr_vec))
 }
-  
-  
-  
-  
+
 
 
 

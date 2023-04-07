@@ -2,6 +2,8 @@
 
 rm(list = ls())
 
+require(purrr)
+
 require(deSolve)
 
 require(ggplot2)
@@ -32,7 +34,7 @@ source("Parameter_estimation_func.R")
 parameters <- c(rate = 0.199,
                 flow = 0.75,
                 G_medium = 800,
-                G50 = 30,
+                G50 = 50,
                 N_rate_inhib_growth = 0.2,
                 lac_con_growth = 0.2,
                 lac_prod_growth = 0.2,
@@ -61,7 +63,7 @@ new_param <- c(rate = 0.6,
 
 sol_real <- ode(init,time,final_model_estimation,new_param)
 
-noised_data <- add_noise(sol_real, mean = 12, sd = 6)
+noised_data <- add_noise(sol_real, mean = 10, sd = 6)
 
 noised_data_frame <- data.frame(noised_data)
 
@@ -76,12 +78,6 @@ ggplot(data = noised_data_frame, aes(x = time, y = N)) + geom_point(size = 3, co
 
 
 # adding noise to our data with rnorm with a self-chosen mean and sd value
-
-
-
-
-
-
 
 
 # function that solves the model given the parameters as input
@@ -123,7 +119,7 @@ objective_func <- function(x, parset = names(x)) {
 
 param_to_fit <- c(rate = 0.7,
                   G_medium = 60,
-                  G_50 = 10)
+                  G50 = 50)
 
 # the minimum and maximum range in which the fit takes place
 
@@ -146,6 +142,72 @@ fit <- modFit(objective_func,
               method = "L-BFGS-B")
 
 fit
+
+parameters[c(1,3,4)] = fit$par 
+
+fit_output <- ode(init,time,final_model_estimation,parameters)
+
+
+
+
+#################### parameter estimation simulation ##################
+
+# we try rate and G50
+
+parameters <- c(rate = 0.199,
+                flow = 0.75,
+                G_medium = 600,
+                G50 = 30,
+                N_rate_inhib_growth = 0.2,
+                lac_con_growth = 0.2,
+                lac_prod_growth = 0.2,
+                N_rate_inhib_mid = 50,
+                lac_con_mid = 60,
+                lac_prod_mid = 50)
+
+N0 <- 5
+G0 <- 400
+L0 <- 0
+
+init <- c(N = N0, G = G0, L = L0)
+
+time <- seq(0,30,0.1)
+
+new_param <- c(rate = 0.6,
+               flow = 0.75,
+               G_medium = 600,
+               G50 = 30,
+               N_rate_inhib_growth = 0.2,
+               lac_con_growth = 0.2,
+               lac_prod_growth = 0.2,
+               N_rate_inhib_mid = 50,
+               lac_con_mid = 60,
+               lac_prod_mid = 50)
+
+sol_real <- ode(init,time,final_model_estimation,new_param)
+
+# parameters to fit 
+
+param_to_fit <- c(rate = 0.7,
+                  G50 = 10)
+
+# the minimum and maximum range in which the fit takes place
+
+bound_min_var <- c(0.01,
+                   5)
+
+bound_max_var <- c(0.8,
+                   200)
+
+
+results <- fit_simulation(objective_func, sol_real, param_to_fit, bound_min_var, bound_max_var, 2)
+
+results
+
+
+
+
+
 
 
 
