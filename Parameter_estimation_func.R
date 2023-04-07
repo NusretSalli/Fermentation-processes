@@ -48,21 +48,6 @@ add_noise <- function(real_data, mean_val, sd_val){
 
 
 
-
-error_function <- function(result, data){
-  
-  
-  error <- sum(abs(result - data)^2)
-  
-  
-  return(error)
-  
-}
-
-
-
-
-
 stochastic_estimation <- function(model, initial, parameters,param_name, time_interval,step_size,data,n_iterations){
   
   for (i in 1:n_iterations){
@@ -123,11 +108,30 @@ stochastic_estimation <- function(model, initial, parameters,param_name, time_in
 }
 
 
-deterministic_estimation <- function(){
+fit_simulation <- function(objective_func, real_data, param_to_fit, bound_min_var, bound_max_var, n_simulations){
   
-  what = 2
+  
+  for (i in 1:n_simulations){
+    
+    noised_data <- add_noise(real_data, mean = 12, sd = 6)
+    
+    fit <- modFit(objective_func,
+                  p = param_to_fit,
+                  lower = bound_min_var,
+                  upper = bound_max_var,
+                  method = "L-BFGS-B") 
+    
+  }
+  
   
   
 }
+  
+  
+  
+  
+
+
+
 
 
