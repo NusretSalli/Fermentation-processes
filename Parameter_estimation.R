@@ -200,7 +200,7 @@ bound_max_var <- c(0.8,
                    200)
 
 
-results <- fit_simulation(objective_func, sol_real, param_to_fit, bound_min_var, bound_max_var, 5)
+results <- fit_simulation(objective_func, sol_real, param_to_fit, bound_min_var, bound_max_var, 100)
 
 # change this so we have a vector of the parameters and a column that explains which parameter is what.
 
@@ -210,11 +210,11 @@ error_sim <- results[[2]]
 
 ## plotting ## 
 
-# ggplot(df, aes(x=weight, color=sex)) +
-#   geom_histogram(fill="white")
-# # Overlaid histograms
-# ggplot(df, aes(x=weight, color=sex)) +
-#   geom_histogram(fill="white", alpha=0.5, position="identity")
+ggplot(df, aes(x=weight, color=sex)) +
+  geom_histogram(fill="white")
+# Overlaid histograms
+ggplot(df, aes(x=weight, color=sex)) +
+  geom_histogram(fill="white", alpha=0.5, position="identity")
 
 
 
