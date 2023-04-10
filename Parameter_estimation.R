@@ -150,10 +150,10 @@ fit_output <- ode(init,time,final_model_estimation,parameters)
 
 #################### parameter estimation simulation ##################
 
-# we try rate and G50
+# we try rate and G50 and flow
 
 parameters <- c(rate = 0.199,
-                flow = 0.75,
+                flow = 0.50,
                 G_medium = 600,
                 G50 = 30,
                 N_rate_inhib_growth = 0.2,
@@ -187,18 +187,21 @@ sol_real <- ode(init,time,final_model_estimation,new_param)
 # parameters to fit 
 
 param_to_fit <- c(rate = 0.7,
+                  flow = 0.5,
                   G50 = 10)
 
 # the minimum and maximum range in which the fit takes place
 
 bound_min_var <- c(0.01,
+                   0.20,
                    5)
 
 bound_max_var <- c(0.8,
+                   0.95,
                    200)
 
 
-results <- fit_simulation(objective_func, sol_real, param_to_fit, bound_min_var, bound_max_var, 100)
+results <- fit_simulation(sol_real, param_to_fit, bound_min_var, bound_max_var, 10)
 
 # change this so we have a vector of the parameters and a column that explains which parameter is what.
 

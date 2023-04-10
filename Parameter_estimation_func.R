@@ -129,8 +129,7 @@ solve_model <- function(pars) {
 }
 
 
-fit_simulation<- function(objective_func,
-                          real_data,
+fit_simulation<- function(real_data,
                           param_to_fit,
                           bound_min_var,
                           bound_max_var,
