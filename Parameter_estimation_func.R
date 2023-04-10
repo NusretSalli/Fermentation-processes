@@ -44,10 +44,6 @@ add_noise <- function(real_data, mean_val, sd_val){
   
 }
 
-
-
-
-
 stochastic_estimation <- function(model, initial, parameters,param_name, time_interval,step_size,data,n_iterations){
   
   for (i in 1:n_iterations){
@@ -113,6 +109,9 @@ stochastic_estimation <- function(model, initial, parameters,param_name, time_in
 
 solve_model <- function(pars) {
   
+  # function to use to solve the model based on initial states and parameters provided
+  
+  
   # initial values
   
   state <- c(N = N0, G = G0, L = L0)
@@ -133,10 +132,18 @@ fit_simulation<- function(real_data,
                           param_to_fit,
                           bound_min_var,
                           bound_max_var,
+                          method,
                           n_simulations){
   
   
+  # function that simulates multiple fitting / parameter estimation with addition to noise to the original
+  # data set
+  
+  # first defining the error vector
+  
   ssr_vec <- numeric(n_simulations)
+  
+  # defining the progress-bar function
   
   pb <- txtProgressBar(min = 0,      # Minimum value of the progress bar
                        max = n_simulations, # Maximum value of the progress bar
@@ -144,9 +151,15 @@ fit_simulation<- function(real_data,
                        width = 50,   # Progress bar width. Defaults to getOption("width")
                        char = "=")   # Character used to create the bar
   
+  # preallocating the parameters dataframe
+  
   parameters_data_frame <- data.frame(matrix(NA, nrow = n_simulations, ncol = length(param_to_fit)))
   
+  # changing the column name to the parameters' name.
+  
   colnames(parameters_data_frame) <- names(param_to_fit)
+  
+  # due to noised data needing to be defined constantly we define it here (change it so that we have it outside)
   
   objective_func_sim <- function(x, noised_data, parset = names(x)) {
     
@@ -160,17 +173,24 @@ fit_simulation<- function(real_data,
     
   }
   
+  # we loop from 1 to the number of simulaionts we want
   
   for (i in 1:n_simulations){
     
+    # we create our data by adding noise to the original data
+    
     noised_data <- add_noise(real_data, mean = 10, sd = 5)
+    
+    # we now fit our model to estimate the parameters
     
     fit <- modFit(objective_func_sim,
                   p = param_to_fit,
                   lower = bound_min_var,
                   upper = bound_max_var,
-                  method = "L-BFGS-B",
+                  method = method,
                   noised_data = noised_data)
+    
+    # change this later - this is not needed
     
     if (i == 1){
       
@@ -186,10 +206,13 @@ fit_simulation<- function(real_data,
       
     }
     
-    # progress bar
+    # progress bar defined
+    
     setTxtProgressBar(pb, i)
     
   }
+  
+  # returning the parameters and error vector in a list.
   
   return(list(parameters_data_frame, ssr_vec))
 }
@@ -197,16 +220,35 @@ fit_simulation<- function(real_data,
 
 histogram_sim_maker <- function(parameter_list, real_parameter_val){
   
+  # function that constructs a histogram of the simulated parameters and displays other useful values
+  
+  # simulating for each parameter that was simulated
+  
   for (i in 1:dim(parameter_list)[2]){
     
+    # creating the plot instance
+    
     plot <- ggplot(parameter_list, aes(x = parameter_list[,i])) + 
+      
+      # geom histogram where we plot the density / frequency
       geom_histogram(aes(y = after_stat(count / sum(count))), bins = 40, color = "black", fill = "red", alpha = 0.5) +
+      
+      # we scale the y-axis such that we have it in percent
       scale_y_continuous(labels = scales::percent)+
-      geom_vline(aes(xintercept=real_parameter_val[i], color="Correct"), linetype = "dashed", linewidth = 1.5)+
-      scale_color_manual(name = "Info",values = c(Correct = "blue")) +
-      xlab(colnames(parameter_list)[i])+
+      
+      # we create 3 vertical lines that display the real parameter value, the mean and the median
+      geom_vline(aes(xintercept=real_parameter_val[i], color="Real"), linetype = "dashed", linewidth = 1.5) +
+      geom_vline(aes(xintercept = mean(parameter_list[,i]),color = "Mean"), linetype = "dashed", linewidth = 1.5) +
+      geom_vline(aes(xintercept = median(parameter_list[,i]),color = "Median"), linetype = "dashed", linewidth = 1.5) +
+      
+      # we create a legend that 
+      scale_color_manual(name = "Info", values = c(Real = "blue", Mean = "Red", Median = "black")) +
+      
+      # displaying the xlabel and ylabel
+      xlab(colnames(parameter_list)[i]) +
       ylab("Percent (%)")
     
+    # printing the plots one by one
     print(plot)
     
   }
