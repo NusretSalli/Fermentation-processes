@@ -2,8 +2,6 @@
 
 rm(list = ls())
 
-require(purrr)
-
 require(deSolve)
 
 require(ggplot2)
@@ -210,14 +208,9 @@ error_sim <- results[[2]]
 
 ## plotting ## 
 
-ggplot(df, aes(x=weight, color=sex)) +
-  geom_histogram(fill="white")
-# Overlaid histograms
-ggplot(df, aes(x=weight, color=sex)) +
-  geom_histogram(fill="white", alpha=0.5, position="identity")
+histogram_sim_maker(param_list,c(0.6,30))
 
-
-
+histogram_sim_maker_2(param_list,c(0.6,30))
 
 
 

@@ -196,6 +196,38 @@ fit_simulation<- function(objective_func,
 }
 
 
+histogram_sim_maker <- function(parameter_list, real_parameter_val){
+  
+  for (i in 1:dim(parameter_list)[2]){
+    
+    plot <- ggplot(parameter_list, aes(x = parameter_list[,i])) + 
+      geom_histogram(aes(y = after_stat(count / sum(count))), bins = 40, color = "black", fill = "red", alpha = 0.5) +
+      scale_y_continuous(labels = scales::percent)+
+      geom_vline(aes(xintercept=real_parameter_val[i], color="Correct"), linetype = "dashed", linewidth = 1.5)+
+      scale_color_manual(name = "Info",values = c(Correct = "blue")) +
+      xlab(colnames(parameter_list)[i])+
+      ylab("Percent (%)")
+    
+    print(plot)
+    
+  }
+  
+}
+
+# histogram_sim_maker_2 <- function(parameter_list, real_parameter_val){
+#   
+#   for (i in 1:dim(parameter_list)[2]){
+#     
+#     plot <- ggplot(parameter_list, aes(x = parameter_list[,i])) + 
+#       geom_histogram(aes(y = after_stat(density)))
+#     
+#     print(plot)
+#     
+#   }
+#   
+# }
+
+
 
 
 
