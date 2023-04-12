@@ -152,7 +152,7 @@ fit_output <- ode(init,time,final_model_estimation,parameters)
 
 #################### parameter estimation simulation ##################
 
-# we try rate
+# we try rate and g50
 
 parameters <- c(rate = 0.199,
                 flow = 0.75,
@@ -176,7 +176,7 @@ time <- seq(0,30,0.1)
 new_param <- c(rate = 0.6,
                flow = 0.75,
                G_medium = 600,
-               G50 = 30,
+               G50 = 60,
                N_rate_inhib_growth = 0.2,
                lac_con_growth = 0.2,
                lac_prod_growth = 0.2,
@@ -188,13 +188,16 @@ sol_real <- ode(init,time,final_model_estimation,new_param)
 
 # parameters to fit 
 
-param_to_fit <- c(rate = 0.199)
+param_to_fit <- c(rate = 0.199,
+                  G50 = 30)
 
 # the minimum and maximum range in which the fit takes place
 
-bound_min_var <- c(0.01)
+bound_min_var <- c(0.01,
+                   10)
 
-bound_max_var <- c(0.8)
+bound_max_var <- c(0.8,
+                   100)
 
 
 results <- fit_simulation(sol_real, param_to_fit, bound_min_var, bound_max_var,"L-BFGS-B", 100)
@@ -207,6 +210,6 @@ error_sim <- results[[2]]
 
 ## plotting ## 
 
-histogram_sim_maker(param_list,c(0.6))
+histogram_sim_maker(param_list,c(0.6,60))
 
 
