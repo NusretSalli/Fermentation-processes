@@ -179,7 +179,7 @@ fit_simulation<- function(real_data,
     
     # we create our data by adding noise to the original data
     
-    noised_data <- add_noise(real_data, mean = 10, sd = 5)
+    noised_data <- add_noise(real_data, mean = 0, sd = 1)
     
     # we now fit our model to estimate the parameters
     

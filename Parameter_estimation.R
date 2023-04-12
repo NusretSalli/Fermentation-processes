@@ -213,3 +213,27 @@ error_sim <- results[[2]]
 histogram_sim_maker(param_list,c(0.6,60))
 
 
+noise_test_data <- add_noise(sol_real, 10, 5)
+
+
+
+
+
+# construct error function
+
+error_function <- function(data){
+  
+  filler = 2
+  
+}
+
+
+
+
+
+
+
+
+
+
+
