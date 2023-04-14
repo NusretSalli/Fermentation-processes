@@ -213,19 +213,31 @@ error_sim <- results[[2]]
 histogram_sim_maker(param_list,c(0.6,60))
 
 
-noise_test_data <- add_noise(sol_real, 10, 5)
+noise_test_data <- add_noise(sol_real, mean = 0, sd = 1)
 
 
+#### TESTING IF OUR ALGORITHM WORKS AND OTHER STUFF ####
+
+test_results <- param_initial_state_tester(noise_test_data,c("rate","G50"),bound_min_var, bound_max_var,"L-BFGS-B",20)
+
+param_end <- test_results[[1]]
+
+param_initial <- test_results[[2]]
 
 
 
 # construct error function
 
-error_function <- function(data){
-  
-  filler = 2
-  
-}
+# error_function <- function(parameters,real_data){
+#   
+#   
+#   
+#   
+#   total_err <- sum((real_data - data)^2)
+#   
+#   return(total_err)
+#   
+# }
 
 
 
