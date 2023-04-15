@@ -280,11 +280,13 @@ param_initial_state_tester <- function(real_data,
   
   # preallocating the parameters dataframe
   
-  parameters_end_data_frame <- data.frame(matrix(NA, nrow = n_simulations, ncol = length(param_names)))
+  parameters_end_data_frame <- data.frame(matrix(NA, nrow = n_simulations, ncol = length(param_names)+1))
+  
+  parameters_end_data_frame[,ncol(parameters_end_data_frame)] <- rep("end",n_simulations)
   
   # changing the column name to the parameters' name.
   
-  colnames(parameters_end_data_frame) <- param_names
+  colnames(parameters_end_data_frame) <- c(param_names,"state")
   
   # due to noised data needing to be defined constantly we define it here (change it so that we have it outside)
   
@@ -300,10 +302,11 @@ param_initial_state_tester <- function(real_data,
     
   }
   
-  parameters_initial_data_frame <- data.frame(matrix(NA, nrow = n_simulations, ncol = length(param_names)))
+  parameters_initial_data_frame <- data.frame(matrix(NA, nrow = n_simulations, ncol = length(param_names)+1))
   
+  parameters_initial_data_frame[,ncol(parameters_initial_data_frame)] <- rep("initial",n_simulations)
   
-  colnames(parameters_initial_data_frame) <- param_names
+  colnames(parameters_initial_data_frame) <- c(param_names,"state")
   
   for (j in 1:length(param_names)){
     
@@ -318,7 +321,7 @@ param_initial_state_tester <- function(real_data,
   
   for (i in 1:n_simulations){
     
-    param_to_fit <- parameters_initial_data_frame[i,]
+    param_to_fit <- parameters_initial_data_frame[i,1:length(param_names)]
     
     names(param_to_fit) <- param_names
     
@@ -334,7 +337,7 @@ param_initial_state_tester <- function(real_data,
     
     # get the parameters
     
-    parameters_end_data_frame[i,] <- fit$par
+    parameters_end_data_frame[i,1:length(param_names)] <- fit$par
     
     
     
@@ -346,10 +349,83 @@ param_initial_state_tester <- function(real_data,
   
   # returning the parameters and error vector in a list.
   
-  return(list(parameters_end_data_frame,parameters_initial_data_frame))
+  
+  total_data_frame <- rbind(parameters_initial_data_frame,parameters_end_data_frame)
+  
+  return(total_data_frame)
 }
 
 
+# construct error function
+
+error_function <- function(parameters,param_to_plot, parset = names(param_to_plot), real_data){
+  
+  parameters[parset] <- param_to_plot
+  
+  output <- solve_model(parameters)
+  
+  total_err <- sum((real_data - output)^2)
+  
+  return(total_err)
+  
+}
+
+
+param_plot_contour <- function(parameters, param_names, bound_min_var, bound_max_var, dimension, true_data){
+  
+  
+  # construct the sequence for the 2 parameters
+  
+  param_1 <- seq(bound_min_var[1], bound_max_var[1], length = dimension[1])
+  
+  names(param_1) <- rep(param_names[1],length(param_1))
+  
+  param_2 <- seq(bound_min_var[2], bound_max_var[2], length = dimension[2])
+  
+  names(param_2) <- rep(param_names[2],length(param_2))
+  
+  results_data_frame <- matrix(NA, nrow = length(param_2), ncol = length(param_1))
+  
+  pb <- txtProgressBar(min = 0,      # Minimum value of the progress bar
+                       max = length(param_1), # Maximum value of the progress bar
+                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
+                       width = 50,   # Progress bar width. Defaults to getOption("width")
+                       char = "=")   # Character used to create the bar
+  
+  
+  for (i in 1:length(param_1)){
+    
+    for (j in 1:length(param_2)){
+      
+      param_to_plot <- c(param_1[i], param_2[j])
+      
+      results_data_frame[j,i] <- round(error_function(parameters, param_to_plot, real_data = true_data),3)
+      
+      
+    }
+    
+    setTxtProgressBar(pb, i)
+    
+  }
+  
+  return(list(param_1,param_2,results_data_frame))
+}
+
+
+
+# error_function_grid <- function(param1,param2){
+#   
+#   parset = names(c(param1[1],param2[1]))
+#   
+#   new_param[parset] <- c(param1,param2)
+#   
+#   output <- solve_model(new_param)
+# 
+#   total_err <- sum((real_data - output)^2)
+# 
+#   return(total_err)
+# 
+# }
 
 
 

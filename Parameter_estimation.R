@@ -18,6 +18,8 @@ require(FME)
 
 require(dplyr)
 
+require(tidyverse)
+
 require(numDeriv)
 
 require(plotly)
@@ -218,34 +220,75 @@ noise_test_data <- add_noise(sol_real, mean = 0, sd = 1)
 
 #### TESTING IF OUR ALGORITHM WORKS AND OTHER STUFF ####
 
-test_results <- param_initial_state_tester(noise_test_data,c("rate","G50"),bound_min_var, bound_max_var,"L-BFGS-B",20)
+test_results <- param_initial_state_tester(noise_test_data,c("rate","G50"),bound_min_var, bound_max_var,"L-BFGS-B",50)
 
-param_end <- test_results[[1]]
+# plotting the results
 
-param_initial <- test_results[[2]]
-
-
-
-# construct error function
-
-# error_function <- function(parameters,real_data){
-#   
-#   
-#   
-#   
-#   total_err <- sum((real_data - data)^2)
-#   
-#   return(total_err)
-#   
-# }
+ggplot(data = test_results, aes(x = rate, y = G50))+
+  geom_point(aes(colour = state), size = 5)+
+  geom_bin_2d(bins = 35)+
+  scale_fill_continuous(low = "dark green", high = "blue")+
+  ggtitle("Initial values and their end destination")
 
 
 
+error_function(new_param, c(rate = 0.6, G50 = 60), real_data = sol_real)
 
 
 
+### Constructing the contour / grid stuff ###
+
+param1 <- seq(bound_min_var[1],bound_max_var[1],0.01)
+
+names(param1) <- "rate"
+
+#rep("rate", length(param1))
 
 
+param2 <- seq(bound_min_var[2],bound_max_var[2], length = 80)
+
+names(param2) <- "G50"
+
+
+# has to call it real_data
+
+
+error_function(new_param,c(rate = 0.6, G50 = 60), real_data = sol_real)
+
+
+results_contour <- param_plot_contour(new_param,
+                                     c("rate","G50"),
+                                     bound_min_var,
+                                     bound_max_var,
+                                     c(100,100),
+                                     true_data = sol_real)
+
+parameter_1 <- results_contour[[1]]
+
+parameter_2 <- results_contour[[2]]
+
+matrix <- results_contour[[3]]
+
+image(parameter_1, parameter_2, matrix)
+
+
+fig <- plot_ly(
+  x = parameter_1, 
+  y = parameter_2, 
+  z = matrix,
+  type = "contour",
+  autocontour = F,
+  contours = list(
+    start = 0,
+    end = 10000,
+    size = 100
+  ),
+  line = list(smoothing = 2)
+)
+
+fig
+
+# which(matrix == min(matrix), arr.ind = TRUE)
 
 
 
