@@ -260,7 +260,7 @@ results_contour <- param_plot_contour(new_param,
                                      c("rate","G50"),
                                      bound_min_var,
                                      bound_max_var,
-                                     c(100,100),
+                                     c(50,50),
                                      true_data = sol_real)
 
 parameter_1 <- results_contour[[1]]
@@ -268,9 +268,6 @@ parameter_1 <- results_contour[[1]]
 parameter_2 <- results_contour[[2]]
 
 matrix <- results_contour[[3]]
-
-image(parameter_1, parameter_2, matrix)
-
 
 fig <- plot_ly(
   x = parameter_1, 
@@ -280,15 +277,30 @@ fig <- plot_ly(
   autocontour = F,
   contours = list(
     start = 0,
-    end = 10000,
-    size = 100
+    end = 100,
+    size = 1
   ),
-  line = list(smoothing = 2)
+  line = list(smoothing = 1)
 )
 
 fig
 
 # which(matrix == min(matrix), arr.ind = TRUE)
 
+### GGPLOT SECTION ###
 
+rownames(matrix) <- parameter_1
+
+colnames(matrix) <- parameter_2
+
+as.data.frame(matrix) %>% 
+  rownames_to_column() %>% 
+  gather(key, value, -rowname) %>% 
+  mutate(key = as.numeric(key), 
+         rowname = as.numeric(rowname)) %>%
+  ggplot() +
+  geom_contour(aes(x = rowname, y = key, z = value), binwidth = 10)+
+  geom_point(aes(x = as.numeric(rownames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[2])]),
+                 y = as.numeric(colnames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[1])])),
+                 color = "red", size = 4)
 
