@@ -231,11 +231,6 @@ ggplot(data = test_results, aes(x = rate, y = G50))+
   ggtitle("Initial values and their end destination")
 
 
-
-error_function(new_param, c(rate = 0.6, G50 = 60), real_data = sol_real)
-
-
-
 ### Constructing the contour / grid stuff ###
 
 param1 <- seq(bound_min_var[1],bound_max_var[1],0.01)
@@ -248,9 +243,6 @@ names(param1) <- "rate"
 param2 <- seq(bound_min_var[2],bound_max_var[2], length = 80)
 
 names(param2) <- "G50"
-
-
-# has to call it real_data
 
 
 error_function(new_param,c(rate = 0.6, G50 = 60), real_data = sol_real)
@@ -274,16 +266,19 @@ fig <- plot_ly(
   y = parameter_2, 
   z = matrix,
   type = "contour",
+  #colors = colorRamp(c("dark green", "blue")),
   autocontour = F,
   contours = list(
     start = 0,
     end = 1000,
-    size = 100
+    size = 10
   ),
-  line = list(smoothing = 1)
+  line = list(smoothing = 0),
+  colorscale = "Jet"
+  
 )
 
-fig
+fig 
 
 # which(matrix == min(matrix), arr.ind = TRUE)
 
@@ -300,9 +295,9 @@ as.data.frame(matrix) %>%
          rowname = as.numeric(rowname)) %>%
   ggplot() +
   #geom_contour(aes(x = rowname, y = key, z = value, colour = value), breaks = seq(0,10000,100))+
-  geom_contour_filled(aes(x = rowname, y = key, z = value), alpha = 0.8, breaks = c(0,10,100,1000, 10000, 1000000))+
+  geom_contour_filled(aes(x = rowname, y = key, z = value), alpha = 0.8, breaks = c(0,1000, 10000, 1000000, 30000000000))+
   geom_point(aes(x = as.numeric(rownames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[2])]),
                  y = as.numeric(colnames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[1])])),
-                 color = "red", size = 4)
+                 color = "red", size = 2)
   
 
