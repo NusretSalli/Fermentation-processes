@@ -278,7 +278,7 @@ fig <- plot_ly(
   
 )
 
-fig 
+fig
 
 # which(matrix == min(matrix), arr.ind = TRUE)
 
