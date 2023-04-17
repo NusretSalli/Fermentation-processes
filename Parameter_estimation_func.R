@@ -44,65 +44,6 @@ add_noise <- function(real_data, mean_val, sd_val){
   
 }
 
-stochastic_estimation <- function(model, initial, parameters,param_name, time_interval,step_size,data,n_iterations){
-  
-  for (i in 1:n_iterations){
-    
-    output <- ode(initial,time_interval,model,parameters)
-    
-    result_output <- output[,2:c(1+length(initial))]
-    
-    
-    param_changing <- unlist(parameters)
-    
-    
-    # calculating the error
-    
-    error <- error_function(result_output, data)
-    
-    # make a random sign generator that gives either 1 or -1
-    
-    rand_sign <- 2*sample(c(0,1), replace=TRUE, size=1)-1
-    
-    # creating a random number from 1 to the number of 
-    
-    rand_index <- sample(1:length(parameters),1)
-    
-    
-    param_changing[rand_index] <- param_changing[rand_index] + step_size[rand_index] * rand_sign
-    
-    # error here - we need to have it as a list in param_changing
-    
-    param_changed <- list()
-    
-    for (l in 1:length(param_name)){
-      
-      param_changed[l] <- param_changing[l]
-      
-    }
-    
-    names(param_changed) <- param_name
-    
-    
-    new_output <- ode(initial, time_interval, model, param_changed)
-    
-    new_result_output <- new_output[,2:c(1+length(initial))]
-    
-    new_error <- error_function(new_result_output, data)
-    
-    if (new_error < error){
-      
-      parameters[rand_index] <- param_changed[rand_index]
-      
-    }
-    
-  }
-  
-  
-  return(c(parameters,error))
-  
-}
-
 
 ## PARAMTER SIMULATION FUNCTIONS ##
 
@@ -246,7 +187,8 @@ histogram_sim_maker <- function(parameter_list, real_parameter_val){
       
       # displaying the xlabel and ylabel
       xlab(colnames(parameter_list)[i]) +
-      ylab("Percent (%)")
+      ylab("Percent (%)")+
+      ggtitle(paste0("results for parameter ",colnames(parameter_list)[i]))
     
     # printing the plots one by one
     print(plot)

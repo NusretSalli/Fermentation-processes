@@ -202,7 +202,7 @@ bound_max_var <- c(0.8,
                    100)
 
 
-results <- fit_simulation(sol_real, param_to_fit, bound_min_var, bound_max_var,"L-BFGS-B", 100)
+results <- fit_simulation(sol_real, param_to_fit, bound_min_var, bound_max_var,"L-BFGS-B", 1000)
 
 # change this so we have a vector of the parameters and a column that explains which parameter is what.
 
@@ -220,14 +220,14 @@ noise_test_data <- add_noise(sol_real, mean = 0, sd = 1)
 
 #### TESTING IF OUR ALGORITHM WORKS AND OTHER STUFF ####
 
-test_results <- param_initial_state_tester(noise_test_data,c("rate","G50"),bound_min_var, bound_max_var,"L-BFGS-B",50)
+test_results <- param_initial_state_tester(noise_test_data,c("rate","G50"),bound_min_var, bound_max_var,"L-BFGS-B",200)
 
 # plotting the results
 
 ggplot(data = test_results, aes(x = rate, y = G50))+
-  geom_point(aes(colour = state), size = 5)+
-  geom_bin_2d(bins = 35)+
-  scale_fill_continuous(low = "dark green", high = "blue")+
+  geom_point(aes(colour = state), size = 3)+
+  geom_bin_2d(bins = 60)+
+  scale_fill_continuous(low = "black", high = "red")+
   ggtitle("Initial values and their end destination")
 
 
