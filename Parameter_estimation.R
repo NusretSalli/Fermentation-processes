@@ -220,13 +220,14 @@ noise_test_data <- add_noise(sol_real, mean = 0, sd = 1)
 
 #### TESTING IF OUR ALGORITHM WORKS AND OTHER STUFF ####
 
-test_results <- param_initial_state_tester(noise_test_data,c("rate","G50"),bound_min_var, bound_max_var,"L-BFGS-B",200)
+test_results <- param_initial_state_tester(noise_test_data,c("rate","G50"),bound_min_var, bound_max_var,"L-BFGS-B",100)
 
 # plotting the results
 
 ggplot(data = test_results, aes(x = rate, y = G50))+
   geom_point(aes(colour = state), size = 3)+
-  geom_bin_2d(bins = 60)+
+  #geom_bin_2d(bins = 60)+
+  #geom_jitter(width = 0.01)+
   scale_fill_continuous(low = "black", high = "red")+
   ggtitle("Initial values and their end destination")
 
