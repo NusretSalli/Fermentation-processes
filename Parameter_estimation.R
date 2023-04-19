@@ -274,7 +274,7 @@ fig <- plot_ly(
     end = 1000,
     size = 10
   ),
-  line = list(smoothing = 0),
+  line = list(smoothing = 1),
   colorscale = "Jet"
   
 )
@@ -296,9 +296,14 @@ as.data.frame(matrix) %>%
          rowname = as.numeric(rowname)) %>%
   ggplot() +
   #geom_contour(aes(x = rowname, y = key, z = value, colour = value), breaks = seq(0,10000,100))+
-  geom_contour_filled(aes(x = rowname, y = key, z = value), alpha = 0.8, breaks = c(0,1000, 10000, 1000000, 30000000000))+
-  geom_point(aes(x = as.numeric(rownames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[2])]),
-                 y = as.numeric(colnames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[1])])),
-                 color = "red", size = 2)
+  geom_contour_filled(aes(x = rowname, y = key, z = value), alpha = 0.6, breaks = c(0,10,100,1000, 10000,1000000,10000000000))+
+  geom_point(aes(x = (as.numeric(rownames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[2])])),
+                 y = (as.numeric(colnames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[1])]))),
+                 color = "black", size = 2)+
+  geom_point(data = test_results, aes(x = rate, y = G50, colour = state), size = 3)+
+  #geom_bin_2d(bins = 60)+
+  #geom_jitter(width = 0.01)+
+  #scale_fill_continuous(low = "black", high = "red")+
+  ggtitle("Initial values and their end destination")
   
 
