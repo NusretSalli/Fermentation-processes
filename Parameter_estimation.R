@@ -259,9 +259,9 @@ error_function(new_param,c(rate = 0.6, G50 = 60), real_data = sol_real)
 
 results_contour <- param_plot_contour(new_param,
                                      c("rate","G50"),
-                                     bound_min_var,
-                                     bound_max_var,
-                                     c(100,100),
+                                     c(0.3,35), # min range
+                                     c(0.8,85), # max range
+                                     c(500,500),
                                      true_data = sol_real)
 
 parameter_1 <- results_contour[[1]]
