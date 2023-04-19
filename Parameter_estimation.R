@@ -262,6 +262,9 @@ parameter_2 <- results_contour[[2]]
 
 matrix <- results_contour[[3]]
 
+minima_point <- c(parameter_1[which(matrix == min(matrix), arr.ind = TRUE)[2]],
+                  parameter_2[which(matrix == min(matrix), arr.ind = TRUE)[1]])
+
 fig <- plot_ly(
   x = parameter_1, 
   y = parameter_2, 
@@ -279,7 +282,7 @@ fig <- plot_ly(
   
 )
 
-fig
+fig %>% add_trace(x = ~minima_point[1], y = ~minima_point[2], name = paste0("minimum: ",as.character(min(matrix))), type = "scatter")
 
 # which(matrix == min(matrix), arr.ind = TRUE)
 
