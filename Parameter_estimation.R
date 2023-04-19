@@ -211,11 +211,11 @@ param_list <- results[[1]]
 error_sim <- results[[2]]
 
 
-##
-test <- cov(param_list)
+## Calculating the covariance and correlation matrix for param_list
+
+cov_matrix <- cov(param_list)
 
 corr_matrix <- cor(param_list)
-
 
 
 ## plotting ## 
