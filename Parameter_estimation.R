@@ -210,6 +210,14 @@ param_list <- results[[1]]
 
 error_sim <- results[[2]]
 
+
+##
+test <- cov(param_list)
+
+corr_matrix <- cor(param_list)
+
+
+
 ## plotting ## 
 
 histogram_sim_maker(param_list,c(0.6,60))
