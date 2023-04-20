@@ -26,6 +26,8 @@ require(plotly)
 
 require(minpack.lm)
 
+require(numDeriv)
+
 source("Models.R")
 
 source("Parameter_estimation_func.R")
@@ -211,13 +213,6 @@ param_list <- results[[1]]
 error_sim <- results[[2]]
 
 
-## Calculating the covariance and correlation matrix for param_list
-
-cov_matrix <- cov(param_list)
-
-corr_matrix <- cor(param_list)
-
-
 ## plotting ## 
 
 histogram_sim_maker(param_list,c(0.6,60))
@@ -254,7 +249,7 @@ param2 <- seq(bound_min_var[2],bound_max_var[2], length = 80)
 names(param2) <- "G50"
 
 
-error_function(new_param,c(rate = 0.6, G50 = 60), real_data = sol_real)
+error_function(new_param,minima_point, real_data = sol_real)
 
 
 results_contour <- param_plot_contour(new_param,
@@ -264,14 +259,30 @@ results_contour <- param_plot_contour(new_param,
                                      c(500,500),
                                      true_data = sol_real)
 
+results_contour_noise <- param_plot_contour(new_param,
+                                            c("rate","G50"),
+                                            c(0.3,35), # min range
+                                            c(0.8,85), # max range
+                                            c(500,500),
+                                            true_data = noise_test_data)
+
 parameter_1 <- results_contour[[1]]
+
+parameter_1_noise <- results_contour_noise[[1]]
 
 parameter_2 <- results_contour[[2]]
 
+parameter_2_noise <- results_contour_noise[[2]]
+
 matrix <- results_contour[[3]]
+
+matrix_noise <- results_contour_noise[[3]]
 
 minima_point <- c(parameter_1[which(matrix == min(matrix), arr.ind = TRUE)[2]],
                   parameter_2[which(matrix == min(matrix), arr.ind = TRUE)[1]])
+
+minima_point_noise <- c(parameter_1_noise[which(matrix_noise == min(matrix_noise), arr.ind = TRUE)[2]],
+                        parameter_2_noise[which(matrix_noise == min(matrix_noise), arr.ind = TRUE)[1]])
 
 fig <- plot_ly(
   x = parameter_1, 
@@ -291,6 +302,27 @@ fig <- plot_ly(
 )
 
 fig %>% add_trace(x = ~minima_point[1], y = ~minima_point[2], name = paste0("minimum: ",as.character(min(matrix))), type = "scatter")
+
+
+fig_noise <- plot_ly(
+  x = parameter_1_noise, 
+  y = parameter_2_noise, 
+  z = matrix_noise,
+  type = "contour",
+  #colors = colorRamp(c("dark green", "blue")),
+  autocontour = F,
+  contours = list(
+    start = 800,
+    end = 1800,
+    size = 10
+  ),
+  line = list(smoothing = 1),
+  colorscale = "Jet"
+  
+)
+
+fig_noise %>% add_trace(x = ~minima_point_noise[1], y = ~minima_point_noise[2], name = paste0("minimum: ",as.character(min(matrix))), type = "scatter")
+
 
 # which(matrix == min(matrix), arr.ind = TRUE)
 
@@ -317,4 +349,35 @@ as.data.frame(matrix) %>%
   #scale_fill_continuous(low = "black", high = "red")+
   ggtitle("Initial values and their end destination")
   
+
+## Calculating the covariance and correlation matrix for param_list
+
+cov_emp_matrix <- cov(param_list)
+
+corr_emp_matrix <- cor(param_list)
+
+
+
+## calculating the covariance and correlation matrix with numderiv ##
+
+error_function_hessian <- function(x){
+  
+  parset = names(x)
+  
+  new_param[parset] <- x
+  
+  output <- solve_model(new_param)
+  
+  total_err <- sum((sol_real - output)^2)
+  
+}
+
+calc_hessian_matrix <- hessian(func = error_function_hessian, x = c(rate = 0.6, G50 = 60))
+
+solved_hessian_matrix <- solve(calc_hessian_matrix)
+
+equal_hessian_matrix <- (1/0.3715791315) * solved_hessian_matrix
+
+corr_theory_matrix <- cov2cor(equal_hessian_matrix) 
+
 
