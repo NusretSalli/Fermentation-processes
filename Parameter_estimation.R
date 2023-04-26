@@ -328,27 +328,27 @@ fig_noise %>% add_trace(x = ~minima_point_noise[1], y = ~minima_point_noise[2], 
 
 ### GGPLOT SECTION ###
 
-rownames(matrix) <- parameter_1
-
-colnames(matrix) <- parameter_2
-
-as.data.frame(matrix) %>% 
-  rownames_to_column() %>% 
-  gather(key, value, -rowname) %>% 
-  mutate(key = as.numeric(key), 
-         rowname = as.numeric(rowname)) %>%
-  ggplot() +
-  #geom_contour(aes(x = rowname, y = key, z = value, colour = value), breaks = seq(0,10000,100))+
-  geom_contour_filled(aes(x = rowname, y = key, z = value), alpha = 0.6, breaks = c(0,10,100,1000, 10000,1000000,10000000000))+
-  geom_point(aes(x = (as.numeric(rownames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[2])])),
-                 y = (as.numeric(colnames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[1])]))),
-                 color = "black", size = 2)+
-  geom_point(data = test_results, aes(x = rate, y = G50, colour = state), size = 3)+
-  #geom_bin_2d(bins = 60)+
-  #geom_jitter(width = 0.01)+
-  #scale_fill_continuous(low = "black", high = "red")+
-  ggtitle("Initial values and their end destination")
-  
+# rownames(matrix) <- parameter_1
+# 
+# colnames(matrix) <- parameter_2
+# 
+# as.data.frame(matrix) %>% 
+#   rownames_to_column() %>% 
+#   gather(key, value, -rowname) %>% 
+#   mutate(key = as.numeric(key), 
+#          rowname = as.numeric(rowname)) %>%
+#   ggplot() +
+#   #geom_contour(aes(x = rowname, y = key, z = value, colour = value), breaks = seq(0,10000,100))+
+#   geom_contour_filled(aes(x = rowname, y = key, z = value), alpha = 0.6, breaks = c(0,10,100,1000, 10000,1000000,10000000000))+
+#   geom_point(aes(x = (as.numeric(rownames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[2])])),
+#                  y = (as.numeric(colnames(matrix)[(which(matrix == min(matrix), arr.ind = TRUE)[1])]))),
+#                  color = "black", size = 2)+
+#   geom_point(data = test_results, aes(x = rate, y = G50, colour = state), size = 3)+
+#   #geom_bin_2d(bins = 60)+
+#   #geom_jitter(width = 0.01)+
+#   #scale_fill_continuous(low = "black", high = "red")+
+#   ggtitle("Initial values and their end destination")
+#   
 
 ## Calculating the covariance and correlation matrix for param_list
 
@@ -376,7 +376,7 @@ calc_hessian_matrix <- hessian(func = error_function_hessian, x = c(rate = 0.6, 
 
 solved_hessian_matrix <- solve(calc_hessian_matrix)
 
-equal_hessian_matrix <- (1/0.3715791315) * solved_hessian_matrix
+equal_hessian_matrix <-  2.691218 * solved_hessian_matrix
 
 corr_theory_matrix <- cov2cor(equal_hessian_matrix) 
 
