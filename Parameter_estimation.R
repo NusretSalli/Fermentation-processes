@@ -218,7 +218,7 @@ error_sim <- results[[2]]
 histogram_sim_maker(param_list,c(0.6,60))
 
 
-noise_test_data <- add_noise(sol_real, mean = 0, sd = 1)
+noise_test_data <- add_noise(sol_real, mean_val = 0, sd_val = 1)
 
 
 #### TESTING IF OUR ALGORITHM WORKS AND OTHER STUFF ####
