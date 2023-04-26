@@ -368,7 +368,7 @@ error_function_hessian <- function(x){
   
   output <- solve_model(new_param)
   
-  total_err <- sum((sol_real - output)^2)
+  total_err <- 1/2*sum((noise_test_data - output)^2)
   
 }
 
@@ -376,8 +376,8 @@ calc_hessian_matrix <- hessian(func = error_function_hessian, x = c(rate = 0.6, 
 
 solved_hessian_matrix <- solve(calc_hessian_matrix)
 
-equal_hessian_matrix <-  2.691218 * solved_hessian_matrix
+#equal_hessian_matrix <-  2.691218 * solved_hessian_matrix
 
-corr_theory_matrix <- cov2cor(equal_hessian_matrix) 
+#corr_theory_matrix <- cov2cor(equal_hessian_matrix) 
 
 
