@@ -27,6 +27,33 @@ final_model_estimation <- function(t,x,p){
   
 }
 
+final_model_estimation_lactate_switch <- function(t,x,p){
+  
+  with(as.list(c(x,p)), {
+    
+    N_rate_inhib <- (N_rate_inhib_max/ (1 + exp(N_rate_inhib_growth*(L-N_rate_inhib_mid))))
+    
+    lac_con <- (lac_con_max / (1 + exp(lac_con_growth*(G-lac_con_mid))))
+    
+    lac_prod <- (lac_prod_max / (1 + exp(-lac_prod_growth*(G-lac_prod_mid))))
+    
+    
+    dN <- rate * N * G / (1 + G / G50) * N_rate_inhib + N * L * lac_con - flow * N
+    
+    dG <- - rate * N * G / (1 + G / G50) * N_rate_inhib + flow * (G_medium - G) - N * lac_prod
+    
+    dL <- N * lac_prod - flow * L - N * L * lac_con
+    
+    
+    return(list(c(dN, dG, dL)))
+    
+    
+  })
+  
+}
+
+
+
 
 add_noise <- function(real_data, mean_val, sd_val){
   
