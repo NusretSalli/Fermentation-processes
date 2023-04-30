@@ -96,7 +96,29 @@ solve_model <- function(pars) {
 }
 
 
-fit_simulation<- function(real_data,
+solve_model_lactate <- function(pars) {
+  
+  # function to use to solve the model based on initial states and parameters provided
+  
+  
+  # initial values
+  
+  state <- c(N = N0, G = G0, L = L0)
+  
+  # time vector
+  
+  time <- seq(0,30,0.1)
+  
+  # store the output and returning it
+  
+  output <- ode(y = state, time, final_model_estimation_lactate_switch, parms = pars)
+  
+  return(output)
+}
+
+
+
+fit_simulation <- function(real_data,
                           param_to_fit,
                           bound_min_var,
                           bound_max_var,
@@ -136,6 +158,96 @@ fit_simulation<- function(real_data,
     parameters[parset] <- x
     
     output <- solve_model(parameters) # solving the model
+    
+    modCost(output, noised_data, x = "time") # calculating the loss
+    
+  }
+  
+  # we loop from 1 to the number of simulaionts we want
+  
+  for (i in 1:n_simulations){
+    
+    # we create our data by adding noise to the original data
+    
+    noised_data <- add_noise(real_data, mean = 0, sd = 1)
+    
+    # we now fit our model to estimate the parameters
+    
+    fit <- modFit(objective_func_sim,
+                  p = param_to_fit,
+                  lower = bound_min_var,
+                  upper = bound_max_var,
+                  method = method,
+                  noised_data = noised_data)
+    
+    # change this later - this is not needed
+    
+    if (i == 1){
+      
+      parameters_data_frame[i,] <- fit$par
+      
+      ssr_vec[i] <- fit$ssr
+      
+    } else {
+      
+      parameters_data_frame[i,] <- fit$par
+      
+      ssr_vec[i] <- fit$ssr
+      
+    }
+    
+    # progress bar defined
+    
+    setTxtProgressBar(pb, i)
+    
+  }
+  
+  # returning the parameters and error vector in a list.
+  
+  return(list(parameters_data_frame, ssr_vec))
+}
+
+
+fit_simulation_lactate <- function(real_data,
+                          param_to_fit,
+                          bound_min_var,
+                          bound_max_var,
+                          method,
+                          n_simulations){
+  
+  
+  # function that simulates multiple fitting / parameter estimation with addition to noise to the original
+  # data set
+  
+  # first defining the error vector
+  
+  ssr_vec <- numeric(n_simulations)
+  
+  # defining the progress-bar function
+  
+  pb <- txtProgressBar(min = 0,      # Minimum value of the progress bar
+                       max = n_simulations, # Maximum value of the progress bar
+                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
+                       width = 50,   # Progress bar width. Defaults to getOption("width")
+                       char = "=")   # Character used to create the bar
+  
+  # preallocating the parameters dataframe
+  
+  parameters_data_frame <- data.frame(matrix(NA, nrow = n_simulations, ncol = length(param_to_fit)))
+  
+  # changing the column name to the parameters' name.
+  
+  colnames(parameters_data_frame) <- names(param_to_fit)
+  
+  # due to noised data needing to be defined constantly we define it here (change it so that we have it outside)
+  
+  objective_func_sim <- function(x, noised_data, parset = names(x)) {
+    
+    # we substitute the parameter values with x ()
+    
+    parameters[parset] <- x
+    
+    output <- solve_model_lactate(parameters) # solving the model
     
     modCost(output, noised_data, x = "time") # calculating the loss
     

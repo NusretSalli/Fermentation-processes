@@ -466,7 +466,7 @@ bound_max_var_lactate <- c(4,
                            1,
                            1)
 
-results_lactate <- fit_simulation(sol_real,
+results_lactate <- fit_simulation_lactate(sol_real,
                           param_to_fit_lactate,
                           bound_min_var_lactate,
                           bound_max_var_lactate,
