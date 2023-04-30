@@ -389,14 +389,14 @@ parameters_lactate <- c(rate = 0.04,
                 G_medium = 400,
                 G50 = 50,
                 N_rate_inhib_growth = 3,
-                lac_con_growth = 3,
-                lac_prod_growth = 3,
+                lac_con_growth = 0.5,
+                lac_prod_growth = 0.5,
                 N_rate_inhib_mid = 40,
-                lac_con_mid = 70,
-                lac_prod_mid = 40,
+                lac_con_mid = 20,
+                lac_prod_mid = 120,
                 N_rate_inhib_max = 0.4,
-                lac_con_max = 0.4,
-                lac_prod_max = 0.4)
+                lac_con_max = 0.9,
+                lac_prod_max = 0.9)
 
 N0 <- 5
 G0 <- 400
@@ -437,33 +437,15 @@ sol_real_dataframe <- data.frame(sol_real)
 #   ylim(0, max(sol_real_dataframe$L)+5)
 
 param_to_fit_lactate <- c(N_rate_inhib_growth = 3,
-                  lac_con_growth = 3,
-                  lac_prod_growth = 3,
-                  N_rate_inhib_mid = 40,
-                  lac_con_mid = 70,
-                  lac_prod_mid = 40,
-                  N_rate_inhib_max = 0.4,
-                  lac_con_max = 0.4,
-                  lac_prod_max = 0.4)
+                          N_rate_inhib_mid = 40,
+                          N_rate_inhib_max = 0.4)
 
 bound_min_var_lactate <- c(0.1,
-                           0.1,
-                           0.1,
                            30,
-                           10,
-                           30,
-                           0.2,
-                           0.2,
                            0.2)
 
 bound_max_var_lactate <- c(4,
-                           4,
-                           4,
-                           150,
-                           100,
-                           150,
-                           1,
-                           1,
+                           180,
                            1)
 
 results_lactate <- fit_simulation_lactate(sol_real,
@@ -471,7 +453,7 @@ results_lactate <- fit_simulation_lactate(sol_real,
                           bound_min_var_lactate,
                           bound_max_var_lactate,
                           "L-BFGS-B", # L-BFGS-B
-                          10)
+                          500)
 
 
 param_list_lactate <- results_lactate[[1]]
@@ -481,17 +463,13 @@ error_sim_lactate <- results_lactate[[2]]
 
 histogram_sim_maker(param_list_lactate,
                     c(N_rate_inhib_growth = 0.5,
-                      lac_con_growth = 0.5,
-                      lac_prod_growth = 0.5,
                       N_rate_inhib_mid = 120,
-                      lac_con_mid = 20,
-                      lac_prod_mid = 120,
-                      N_rate_inhib_max = 0.9,
-                      lac_con_max = 0.9,
-                      lac_prod_max = 0.9))
+                      N_rate_inhib_max = 0.9))
 
 
+cov_lactate <- cov(param_list_lactate)
 
+corr_lactate <- cor(param_list_lactate)
 
 
 

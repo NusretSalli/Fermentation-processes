@@ -245,9 +245,9 @@ fit_simulation_lactate <- function(real_data,
     
     # we substitute the parameter values with x ()
     
-    parameters[parset] <- x
+    parameters_lactate[parset] <- x
     
-    output <- solve_model_lactate(parameters) # solving the model
+    output <- solve_model_lactate(parameters_lactate) # solving the model
     
     modCost(output, noised_data, x = "time") # calculating the loss
     
