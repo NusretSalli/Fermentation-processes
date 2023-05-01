@@ -57,7 +57,7 @@ output <- data.frame(sol)
 
 ## WHAT UFFE WANTS ##
 
-ggplot(data = output, aes(x = N, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+ggplot(data = output, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
   labs(title = "Number of cells", x = "time", y = "number of cells")
 
 

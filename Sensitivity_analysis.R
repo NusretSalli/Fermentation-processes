@@ -31,7 +31,7 @@ bound_var <- c("rate",
                "N_rate_inhib_mid",
                "lac_con_mid",
                "lac_prod_mid",
-               "n_rate_inhib_max",
+               "N_rate_inhib_max",
                "lac_con_max",
                "lac_prod_max")
 
@@ -39,13 +39,13 @@ bound_var <- c("rate",
 bound_min_var <- c(0.001,
                    0.20,
                    50,
-                   0.01,
+                   5,
                    0.1,
                    0.1,
                    0.1,
-                   30,
-                   30,
-                   30,
+                   10,
+                   10,
+                   10,
                    0.1,
                    0.1,
                    0.1)
@@ -54,9 +54,9 @@ bound_max_var <- c(0.7,
                    0.95,
                    700,
                    400,
-                   2,
-                   2,
-                   2,
+                   3,
+                   3,
+                   3,
                    200,
                    200,
                    200,
@@ -67,14 +67,14 @@ bound_max_var <- c(0.7,
 time_val <- c(0.01, seq(0.1,30, by = 0.1))
 
 N0 <- 5
-G0 <- 400
+G0 <- 395
 L0 <- 0
 
 x0 <- c(N = N0, G = G0, L = L0)
 
 p <- list()
 
-p$rate <- 0.1
+p$rate <- 0.04
 
 p$flow <- 0.75 # this shouldn't change from 0.75
 
@@ -82,25 +82,40 @@ p$G_medium <- 400
 
 p$G50 <- 50
 
-p$N_rate_inhib_growth <- 0.2
+p$N_rate_inhib_growth <- 0.5
 
-p$lac_con_growth <- 0.2
+p$lac_con_growth <- 0.5
 
-p$lac_prod_growth <- 0.2
+p$lac_prod_growth <- 0.5
 
-p$N_rate_inhib_mid <- 50
+p$N_rate_inhib_mid <- 120
 
-p$lac_con_mid <- 60
+p$lac_con_mid <- 20
 
-p$lac_prod_mid <- 30
+p$lac_prod_mid <- 120
 
-p$n_rate_inhib_max <- 0.8
+p$N_rate_inhib_max <- 0.9
 
 p$lac_con_max <- 0.9
 
-p$lac_prod_max <- 0.75
+p$lac_prod_max <- 0.9
 
 time <- seq(0,30,0.1)
+
+sol_real_sens <- ode(init,time,final_model_estimation_lactate_switch,p)
+
+sol_real_dataframe_sens <- data.frame(sol_real_sens)
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Number of cells", x = "time", y = "number of cells")
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Glucose levels", x = "time", y = "glucose levels") +
+  ylim(0, max(sol_real_dataframe$G)+5)
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Lactate levels", x = "time", y = "Lactate") +
+  ylim(0, max(sol_real_dataframe$L)+5)
 
 
 sensitive_sobol_final <- sobol_sensitivity(final_model_analysis,
@@ -149,11 +164,11 @@ param_name <- c("rate",
                 "N_rate_inhib_mid",
                 "lac_con_mid",
                 "lac_prod_mid",
-                "n_rate_inhib_max",
+                "N_rate_inhib_max",
                 "lac_con_max",
                 "lac_prod_max")
 
-n_iterations <- 1000
+n_iterations <- 2000
 
 rate_list <- runif(n_iterations, min = 0.001, max = 0.2)
 
@@ -370,15 +385,6 @@ param_upper_list <- c(0.4, # rate
 result <- param_simulator_plotter(param_lower_list, param_upper_list, p, param_name, 30)
 
 result[["epsilon"]]
-
-
-# show the plot by typing result[["name of the variable"]]
-
-
-## Contour plot optimization ##
-
-
-
 
 
 

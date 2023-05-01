@@ -154,7 +154,7 @@ final_model <- function(t,x,p)
          
          # G should maybe be "mætning" - maximum number of rate?
          
-         N_rate_inhib <- (n_rate_inhib_max / (1 + exp(N_rate_inhib_growth*(L-N_rate_inhib_mid))))
+         N_rate_inhib <- (N_rate_inhib_max / (1 + exp(N_rate_inhib_growth*(L-N_rate_inhib_mid))))
          
          lac_con <- (lac_con_max / (1 + exp(lac_con_growth*(G-lac_con_mid))))
          

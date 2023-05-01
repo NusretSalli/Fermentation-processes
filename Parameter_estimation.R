@@ -399,7 +399,7 @@ parameters_lactate <- c(rate = 0.04,
                 lac_prod_max = 0.9)
 
 N0 <- 5
-G0 <- 400
+G0 <- 395
 L0 <- 0
 
 init <- c(N = N0, G = G0, L = L0)
@@ -413,7 +413,7 @@ new_param_lactate <- c(rate = 0.04,
                         N_rate_inhib_growth = 0.5,
                         lac_con_growth = 0.5,
                         lac_prod_growth = 0.5,
-                        N_rate_inhib_mid = 120,
+                        N_rate_inhib_mid = 120, # change to 90 for oscillation 120 for non-oscillation
                         lac_con_mid = 20,
                         lac_prod_mid = 120,
                         N_rate_inhib_max = 0.9,
@@ -425,16 +425,16 @@ sol_real <- ode(init,time,final_model_estimation_lactate_switch,new_param_lactat
 
 sol_real_dataframe <- data.frame(sol_real)
 
-# ggplot(data = sol_real_dataframe, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
-#   labs(title = "Number of cells", x = "time", y = "number of cells")
-# 
-# ggplot(data = sol_real_dataframe, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
-#   labs(title = "Glucose levels", x = "time", y = "glucose levels") + 
-#   ylim(0, max(sol_real_dataframe$G)+5)
-# 
-# ggplot(data = sol_real_dataframe, aes(x = time, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
-#   labs(title = "Lactate levels", x = "time", y = "Lactate") + 
-#   ylim(0, max(sol_real_dataframe$L)+5)
+ggplot(data = sol_real_dataframe, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Number of cells", x = "time", y = "number of cells")
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Glucose levels", x = "time", y = "glucose levels") +
+  ylim(0, max(sol_real_dataframe$G)+5)
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Lactate levels", x = "time", y = "Lactate") +
+  ylim(0, max(sol_real_dataframe$L)+5)
 
 param_to_fit_lactate <- c(N_rate_inhib_growth = 3,
                           N_rate_inhib_mid = 40,
