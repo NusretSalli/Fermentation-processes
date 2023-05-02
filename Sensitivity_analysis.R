@@ -132,6 +132,12 @@ plot(sensitive_sobol_final, pars_plot = bound_var[1:4], state_plot = "G", main_t
 
 plot(sensitive_sobol_final, pars_plot = bound_var[1:4], state_plot = "L", main_title = "L sensitivity - SOBOL", type = "l", lwd = 3)
 
+plot(sensitive_sobol_final, pars_plot = bound_var[5:13], state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 3)
+
+plot(sensitive_sobol_final, pars_plot = bound_var[5:13], state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 3)
+
+plot(sensitive_sobol_final, pars_plot = bound_var[5:13], state_plot = "L", main_title = "L sensitivity - SOBOL", type = "l", lwd = 3)
+
 
 # morris # 
 
@@ -149,6 +155,14 @@ plot(sensitive_morris_final, pars_plot = bound_var[1:4], state_plot = "N", kind 
 plot(sensitive_morris_final, pars_plot = bound_var[1:4], state_plot = "G", kind = "sep", main_title = "G sensitivity - Morris", type = "l")
 
 plot(sensitive_morris_final, pars_plot = bound_var[1:4], state_plot = "L", kind = "sep", main_title = "L sensitivity - Morris", type = "l")
+
+
+plot(sensitive_morris_final, pars_plot = bound_var[5:13], state_plot = "N", kind = "sep", main_title = "N sensitivity - Morris", type = "l")
+
+plot(sensitive_morris_final, pars_plot = bound_var[5:13], state_plot = "G", kind = "sep", main_title = "G sensitivity - Morris", type = "l")
+
+plot(sensitive_morris_final, pars_plot = bound_var[5:13], state_plot = "L", kind = "sep", main_title = "L sensitivity - Morris", type = "l")
+
 
 # PRCC #
 
