@@ -106,10 +106,10 @@ sol_real_sens <- ode(init,time,final_model_estimation_lactate_switch,p)
 
 sol_real_dataframe_sens <- data.frame(sol_real_sens)
 
-ggplot(data = sol_real_dataframe, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+ggplot(data = sol_real_dataframe, aes(x = N, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
   labs(title = "Number of cells", x = "time", y = "number of cells")
 
-ggplot(data = sol_real_dataframe, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+ggplot(data = sol_real_dataframe, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
   labs(title = "Glucose levels", x = "time", y = "glucose levels") +
   ylim(0, max(sol_real_dataframe$G)+5)
 

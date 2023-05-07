@@ -15,15 +15,15 @@ source("Models.R")
 require(plotly)
 
 ## Initial state
-N0 <- 5
-G0 <- 395
-L0 <- 0
+N0 <- 100
+G0 <- 200
+L0 <- 100
 
 x0 <- c(N = N0, G = G0, L = L0)
 
 p <- list()
 
-p$rate <- 0.05
+p$rate <- 0.04
 
 p$flow <- 0.75 # this shouldn't change from 0.75
 
@@ -31,19 +31,19 @@ p$G_medium <- 400
 
 p$G50 <- 50
 
-p$N_rate_inhib_growth <- 0.2
+p$N_rate_inhib_growth <- 0.5
 
-p$lac_con_growth <- 0.2
+p$lac_con_growth <- 0.5
 
-p$lac_prod_growth <- 0.2
+p$lac_prod_growth <- 0.5
 
-p$N_rate_inhib_mid <- 108
+p$N_rate_inhib_mid <- 120
 
 p$lac_con_mid <- 20
 
-p$lac_prod_mid <- 130
+p$lac_prod_mid <- 120
 
-p$n_rate_inhib_max <- 0.8
+p$N_rate_inhib_max <- 0.9
 
 p$lac_con_max <- 0.9
 
@@ -57,11 +57,13 @@ output <- data.frame(sol)
 
 ## WHAT UFFE WANTS ##
 
-ggplot(data = output, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
-  labs(title = "Number of cells", x = "time", y = "number of cells")
+ggplot(data = output, aes(x = N, y = G)) + geom_point(size = 2, color = "blue", alpha = 0.5) + 
+  labs(title = "NG-plane for plot (b)", x = "N", y = "G")+
+  xlim(c(70,150))+
+  ylim(c(110,250))
 
 
-ggplot(data = output, aes(x = N, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+ggplot(data = output, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
   labs(title = "Number of cells", x = "time", y = "number of cells")
 
 ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
@@ -70,21 +72,21 @@ ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") 
 
 # when doing with different initial values #
 
-n_iterations <- 600
+n_iterations <- 100
 
 
 output_simulation <- phase_plane_data(n_iterations)
 
 ggplot(data = output_simulation, aes(x = N, y = G)) + geom_point(aes(color = N0_value),size = 1.2) +
-  labs(title = "NG phaseplot from 600 simulations", x = "N", y = "G")+
+  labs(title = "NG phaseplot from 100 simulations", x = "N", y = "G")+
   scale_color_gradientn(colours = rainbow(100))
 
 ggplot(data = output_simulation, aes(x = N, y = L)) + geom_point(aes(color = N0_value),size = 1) +
-  labs(title = "NL phaseplot from 600 simulations", x = "N", y = "L")+
+  labs(title = "NL phaseplot from 100 simulations", x = "N", y = "L")+
   scale_color_gradientn(colours = rainbow(100))
 
 ggplot(data = output_simulation, aes(x = G, y = L)) + geom_point(aes(color = N0_value),size = 1) +
-  labs(title = "GL phaseplot  from 600 simulations", x = "G", y = "L")+
+  labs(title = "GL phaseplot  from 100 simulations", x = "G", y = "L")+
   scale_color_gradientn(colours = rainbow(10))
 
 
