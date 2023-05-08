@@ -132,6 +132,7 @@ plot(sensitive_sobol_final, pars_plot = bound_var[1:4], state_plot = "G", main_t
 
 plot(sensitive_sobol_final, pars_plot = bound_var[1:4], state_plot = "L", main_title = "L sensitivity - SOBOL", type = "l", lwd = 3)
 
+
 plot(sensitive_sobol_final, pars_plot = bound_var[5:13], state_plot = "N", main_title = "N sensitivity - SOBOL", type = "l", lwd = 3)
 
 plot(sensitive_sobol_final, pars_plot = bound_var[5:13], state_plot = "G", main_title = "G sensitivity - SOBOL", type = "l", lwd = 3)
@@ -237,6 +238,7 @@ results_PRCC <- PRCC_calc(final_model,
 colnames(results_PRCC)[1:length(param_name)] <- param_name 
 
 
+
 # pair plot scatterplot # 
 
 pairs_plot_sim(results_PRCC, state_name, param_name)
@@ -249,9 +251,9 @@ PRCC_data <- PRCC_data_maker(results_PRCC, state_name, param_name)
 
 # PRCC plot
 
-PRCC_plot <- PRCC_plot(PRCC_data,status)
+PRCC_plot_res <- PRCC_plot(PRCC_data,status)
 
-PRCC_plot
+PRCC_plot_res
 
 
 

@@ -225,12 +225,22 @@ noise_test_data <- add_noise(sol_real, mean_val = 0, sd_val = 1)
 
 test_results <- param_initial_state_tester(noise_test_data,c("rate","G50"),bound_min_var, bound_max_var,"L-BFGS-B",100)
 
+# only for plotting 
+
+number_vector <- rep(NA,200)
+
+number_vector[c(66,66+100)] <- 1
+
+number_vector[101] <- 99
+
+final_test_results <- cbind(test_results,number_vector)
+
 # plotting the results
 
-ggplot(data = test_results, aes(x = rate, y = G50))+
-  geom_point(aes(colour = state), size = 3)+
+ggplot(data = final_test_results, aes(x = rate, y = G50, label = number_vector))+
+  geom_point(aes(colour = state), size = 4)+
   #geom_bin_2d(bins = 60)+
-  #geom_jitter(width = 0.01)+
+  geom_text(size = 4)+
   scale_fill_continuous(low = "black", high = "red")+
   ggtitle("Initial values and their end destination")
 
@@ -263,7 +273,7 @@ results_contour_noise <- param_plot_contour(new_param,
                                             c("rate","G50"),
                                             c(0.3,35), # min range
                                             c(0.8,85), # max range
-                                            c(500,500),
+                                            c(100,100),
                                             true_data = noise_test_data)
 
 parameter_1 <- results_contour[[1]]
@@ -370,9 +380,12 @@ error_function_hessian <- function(x){
   
   total_err <- 1/2*sum((noise_test_data - output)^2)
   
+  return(total_err)
+  
 }
 
-calc_hessian_matrix <- hessian(func = error_function_hessian, x = c(rate = 0.6, G50 = 60))
+calc_hessian_matrix <- hessian(func = error_function_hessian, x = c(minima_point_noise[1],
+                                                                    minima_point_noise[2]))
 
 solved_hessian_matrix <- solve(calc_hessian_matrix)
 
@@ -388,15 +401,15 @@ parameters_lactate <- c(rate = 0.04,
                 flow = 0.75,
                 G_medium = 400,
                 G50 = 50,
-                N_rate_inhib_growth = 3,
+                N_rate_inhib_growth = 0.5,
                 lac_con_growth = 0.5,
-                lac_prod_growth = 0.5,
-                N_rate_inhib_mid = 40,
+                lac_prod_growth = 4,
+                N_rate_inhib_mid = 120,
                 lac_con_mid = 20,
-                lac_prod_mid = 120,
-                N_rate_inhib_max = 0.4,
+                lac_prod_mid = 40,
+                N_rate_inhib_max = 0.9,
                 lac_con_max = 0.9,
-                lac_prod_max = 0.9)
+                lac_prod_max = 0.15)
 
 N0 <- 5
 G0 <- 395
@@ -436,16 +449,16 @@ ggplot(data = sol_real_dataframe, aes(x = time, y = L)) + geom_point(size = 3, c
   labs(title = "Lactate levels", x = "time", y = "Lactate") +
   ylim(0, max(sol_real_dataframe$L)+5)
 
-param_to_fit_lactate <- c(N_rate_inhib_growth = 3,
-                          N_rate_inhib_mid = 40,
-                          N_rate_inhib_max = 0.4)
+param_to_fit_lactate <- c(lac_prod_growth = 4,
+                          lac_prod_mid = 40,
+                          lac_prod_max = 0.15)
 
 bound_min_var_lactate <- c(0.1,
                            30,
-                           0.2)
+                           0.1)
 
-bound_max_var_lactate <- c(4,
-                           180,
+bound_max_var_lactate <- c(5,
+                           170,
                            1)
 
 results_lactate <- fit_simulation_lactate(sol_real,
@@ -453,7 +466,7 @@ results_lactate <- fit_simulation_lactate(sol_real,
                           bound_min_var_lactate,
                           bound_max_var_lactate,
                           "L-BFGS-B", # L-BFGS-B
-                          500)
+                          1000)
 
 
 param_list_lactate <- results_lactate[[1]]
@@ -462,15 +475,102 @@ error_sim_lactate <- results_lactate[[2]]
 
 
 histogram_sim_maker(param_list_lactate,
-                    c(N_rate_inhib_growth = 0.5,
-                      N_rate_inhib_mid = 120,
-                      N_rate_inhib_max = 0.9))
+                    c(lac_prod_growth = 0.5,
+                      lac_prod_mid = 120,
+                      lac_prod_max = 0.9))
 
 
 cov_lactate <- cov(param_list_lactate)
 
 corr_lactate <- cor(param_list_lactate)
 
+## another example with lac_con ##
 
+parameters_lactate <- c(rate = 0.04,
+                        flow = 0.75,
+                        G_medium = 400,
+                        G50 = 50,
+                        N_rate_inhib_growth = 0.5,
+                        lac_con_growth = 0.5,
+                        lac_prod_growth = 4,
+                        N_rate_inhib_mid = 120,
+                        lac_con_mid = 20,
+                        lac_prod_mid = 40,
+                        N_rate_inhib_max = 0.9,
+                        lac_con_max = 0.9,
+                        lac_prod_max = 0.15)
+
+N0 <- 5
+G0 <- 395
+L0 <- 0
+
+init <- c(N = N0, G = G0, L = L0)
+
+time <- seq(0,30,0.1)
+
+new_param_lactate <- c(rate = 0.04,
+                       flow = 0.75,
+                       G_medium = 400,
+                       G50 = 50,
+                       N_rate_inhib_growth = 0.5,
+                       lac_con_growth = 0.5,
+                       lac_prod_growth = 0.5,
+                       N_rate_inhib_mid = 120, # change to 90 for oscillation 120 for non-oscillation
+                       lac_con_mid = 20,
+                       lac_prod_mid = 120,
+                       N_rate_inhib_max = 0.9,
+                       lac_con_max = 0.9,
+                       lac_prod_max = 0.9)
+
+
+sol_real <- ode(init,time,final_model_estimation_lactate_switch,new_param_lactate)
+
+sol_real_dataframe <- data.frame(sol_real)
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Number of cells", x = "time", y = "number of cells")
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Glucose levels", x = "time", y = "glucose levels") +
+  ylim(0, max(sol_real_dataframe$G)+5)
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Lactate levels", x = "time", y = "Lactate") +
+  ylim(0, max(sol_real_dataframe$L)+5)
+
+param_to_fit_lactate <- c(lac_prod_growth = 4,
+                          lac_prod_mid = 40,
+                          lac_prod_max = 0.15)
+
+bound_min_var_lactate <- c(0.1,
+                           30,
+                           0.1)
+
+bound_max_var_lactate <- c(5,
+                           170,
+                           1)
+
+results_lactate <- fit_simulation_lactate(sol_real,
+                                          param_to_fit_lactate,
+                                          bound_min_var_lactate,
+                                          bound_max_var_lactate,
+                                          "L-BFGS-B", # L-BFGS-B
+                                          1000)
+
+
+param_list_lactate <- results_lactate[[1]]
+
+error_sim_lactate <- results_lactate[[2]]
+
+
+histogram_sim_maker(param_list_lactate,
+                    c(lac_prod_growth = 0.5,
+                      lac_prod_mid = 120,
+                      lac_prod_max = 0.9))
+
+
+cov_lactate <- cov(param_list_lactate)
+
+corr_lactate <- cor(param_list_lactate)
 
 
