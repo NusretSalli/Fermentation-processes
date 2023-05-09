@@ -491,14 +491,14 @@ parameters_lactate <- c(rate = 0.04,
                         G_medium = 400,
                         G50 = 50,
                         N_rate_inhib_growth = 0.5,
-                        lac_con_growth = 0.5,
-                        lac_prod_growth = 4,
+                        lac_con_growth = 4,
+                        lac_prod_growth = 0.5,
                         N_rate_inhib_mid = 120,
-                        lac_con_mid = 20,
-                        lac_prod_mid = 40,
+                        lac_con_mid = 210,
+                        lac_prod_mid = 120,
                         N_rate_inhib_max = 0.9,
-                        lac_con_max = 0.9,
-                        lac_prod_max = 0.15)
+                        lac_con_max = 0.3,
+                        lac_prod_max = 0.9)
 
 N0 <- 5
 G0 <- 395
@@ -538,23 +538,23 @@ ggplot(data = sol_real_dataframe, aes(x = time, y = L)) + geom_point(size = 3, c
   labs(title = "Lactate levels", x = "time", y = "Lactate") +
   ylim(0, max(sol_real_dataframe$L)+5)
 
-param_to_fit_lactate <- c(lac_prod_growth = 4,
-                          lac_prod_mid = 40,
-                          lac_prod_max = 0.15)
+param_to_fit_lactate <- c(lac_con_growth = 4,
+                          lac_con_mid = 210,
+                          lac_con_max = 0.3)
 
 bound_min_var_lactate <- c(0.1,
-                           30,
-                           0.1)
+                           1,
+                           0.01)
 
 bound_max_var_lactate <- c(5,
-                           170,
+                           230,
                            1)
 
 results_lactate <- fit_simulation_lactate(sol_real,
                                           param_to_fit_lactate,
                                           bound_min_var_lactate,
                                           bound_max_var_lactate,
-                                          "L-BFGS-B", # L-BFGS-B
+                                          "Nelder-Mead", # L-BFGS-B
                                           1000)
 
 
@@ -564,13 +564,13 @@ error_sim_lactate <- results_lactate[[2]]
 
 
 histogram_sim_maker(param_list_lactate,
-                    c(lac_prod_growth = 0.5,
-                      lac_prod_mid = 120,
-                      lac_prod_max = 0.9))
+                    c(lac_con_growth = 0.5,
+                      lac_con_mid = 20,
+                      lac_con_max = 0.9))
 
 
-cov_lactate <- cov(param_list_lactate)
+cov_lactate2 <- cov(param_list_lactate)
 
-corr_lactate <- cor(param_list_lactate)
+corr_lactate2 <- cor(param_list_lactate)
 
 
