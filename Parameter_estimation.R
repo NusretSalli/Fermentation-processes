@@ -486,19 +486,19 @@ corr_lactate <- cor(param_list_lactate)
 
 ## another example with lac_con ##
 
-parameters_lactate <- c(rate = 0.04,
+parameters <- c(rate = 0.04,
                         flow = 0.75,
                         G_medium = 400,
                         G50 = 50,
                         N_rate_inhib_growth = 0.5,
                         lac_con_growth = 4,
-                        lac_prod_growth = 0.5,
+                        lac_prod_growth = 4,
                         N_rate_inhib_mid = 120,
                         lac_con_mid = 210,
-                        lac_prod_mid = 120,
+                        lac_prod_mid = 40,
                         N_rate_inhib_max = 0.9,
                         lac_con_max = 0.3,
-                        lac_prod_max = 0.9)
+                        lac_prod_max = 0.15)
 
 N0 <- 5
 G0 <- 395
@@ -538,23 +538,32 @@ ggplot(data = sol_real_dataframe, aes(x = time, y = L)) + geom_point(size = 3, c
   labs(title = "Lactate levels", x = "time", y = "Lactate") +
   ylim(0, max(sol_real_dataframe$L)+5)
 
-param_to_fit_lactate <- c(lac_con_growth = 4,
+param_to_fit_total <- c(lac_con_growth = 4,
                           lac_con_mid = 210,
-                          lac_con_max = 0.3)
+                          lac_con_max = 0.3,
+                          lac_prod_growth = 4,
+                          lac_prod_mid = 40,
+                          lac_prod_max = 0.15)
 
-bound_min_var_lactate <- c(0.1,
+bound_min_var_total <- c(0.1,
                            1,
-                           0.01)
+                         0.01,
+                         0.1,
+                         30,
+                         0.1)
 
-bound_max_var_lactate <- c(5,
+bound_max_var_total <- c(5,
                            230,
-                           1)
+                           1,
+                         5,
+                         170,
+                         1)
 
-results_lactate <- fit_simulation_lactate(sol_real,
-                                          param_to_fit_lactate,
-                                          bound_min_var_lactate,
-                                          bound_max_var_lactate,
-                                          "Nelder-Mead", # L-BFGS-B
+results_lactate <- fit_simulation_lactate(sol_real_total,
+                                          param_to_fit_total,
+                                          bound_min_var_total,
+                                          bound_max_var_total,
+                                          "L-BFGS-B", # L-BFGS-B
                                           1000)
 
 
@@ -572,5 +581,108 @@ histogram_sim_maker(param_list_lactate,
 cov_lactate2 <- cov(param_list_lactate)
 
 corr_lactate2 <- cor(param_list_lactate)
+
+### total lactate switch estimation
+
+parameters <- c(rate = 0.04,
+                flow = 0.75,
+                G_medium = 400,
+                G50 = 50,
+                N_rate_inhib_growth = 0.5,
+                lac_con_growth = 4,
+                lac_prod_growth = 4,
+                N_rate_inhib_mid = 120,
+                lac_con_mid = 210,
+                lac_prod_mid = 40,
+                N_rate_inhib_max = 0.9,
+                lac_con_max = 0.3,
+                lac_prod_max = 0.15)
+
+N0 <- 5
+G0 <- 395
+L0 <- 0
+
+init <- c(N = N0, G = G0, L = L0)
+
+time <- seq(0,30,0.1)
+
+new_param_total <- c(rate = 0.04,
+                       flow = 0.75,
+                       G_medium = 400,
+                       G50 = 50,
+                       N_rate_inhib_growth = 0.5,
+                       lac_con_growth = 0.5,
+                       lac_prod_growth = 0.5,
+                       N_rate_inhib_mid = 120, # change to 90 for oscillation 120 for non-oscillation
+                       lac_con_mid = 20,
+                       lac_prod_mid = 120,
+                       N_rate_inhib_max = 0.9,
+                       lac_con_max = 0.9,
+                       lac_prod_max = 0.9)
+
+
+sol_real <- ode(init,time,final_model_estimation_lactate_switch,new_param_total)
+
+sol_real_dataframe <- data.frame(sol_real)
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Number of cells", x = "time", y = "number of cells")
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Glucose levels", x = "time", y = "glucose levels") +
+  ylim(0, max(sol_real_dataframe$G)+5)
+
+ggplot(data = sol_real_dataframe, aes(x = time, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Lactate levels", x = "time", y = "Lactate") +
+  ylim(0, max(sol_real_dataframe$L)+5)
+
+param_to_fit_total <- c(lac_con_growth = 4,
+                        lac_con_mid = 210,
+                        lac_con_max = 0.3,
+                        lac_prod_growth = 4,
+                        lac_prod_mid = 40,
+                        lac_prod_max = 0.15)
+
+bound_min_var_total <- c(0.1,
+                         1,
+                         0.01,
+                         0.1,
+                         30,
+                         0.1)
+
+bound_max_var_total <- c(5,
+                         230,
+                         1,
+                         5,
+                         170,
+                         1)
+
+results_total <- fit_simulation_lactate(sol_real,
+                                          param_to_fit_total,
+                                          bound_min_var_total,
+                                          bound_max_var_total,
+                                          "L-BFGS-B", # L-BFGS-B
+                                          500)
+
+
+param_list_total <- results_total[[1]]
+
+error_sim_total <- results_total[[2]]
+
+
+histogram_sim_maker(param_list_total,
+                    c(lac_con_growth = 0.5,
+                      lac_con_mid = 20,
+                      lac_con_max = 0.9,
+                      lac_prod_growth = 0.5,
+                      lac_prod_mid = 120,
+                      lac_prod_max = 0.9))
+
+
+cov_lactate_total <- cov(param_list_total)
+
+corr_lactate_total <- cor(param_list_total)
+
+
 
 
