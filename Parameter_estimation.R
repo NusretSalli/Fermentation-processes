@@ -685,4 +685,24 @@ corr_lactate_total <- cor(param_list_total)
 
 
 
+## logistic function plots.
+
+G_level <- seq(100,130,1)
+
+lac_con_vec <- (1 / (1 + exp(p$lac_con_growth*(G_level-p$lac_con_mid))))
+
+lac_prod_vec <- (1 / (1 + exp(-p$lac_prod_growth*(G_level-p$lac_prod_mid))))
+
+logistic_data_frame <- data.frame(cbind(lac_con_vec, lac_prod_vec, G_level))
+
+
+ggplot(data = logistic_data_frame, aes(x = G_level, y = lac_con_vec)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Logistic function for rho(G)", x = "Glucose levels", y = "factor")
+
+ggplot(data = logistic_data_frame, aes(x = G_level, y = lac_prod_vec)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
+  labs(title = "Logistic function for xi(G)", x = "Glucose levels", y = "factor")
+
+
+
+
 
