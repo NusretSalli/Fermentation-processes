@@ -72,14 +72,14 @@ ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") 
 
 # when doing with different initial values #
 
-n_iterations <- 100
+n_iterations <- 50
 
 
 output_simulation <- phase_plane_data(n_iterations)
 
 ggplot(data = output_simulation, aes(x = N, y = G)) + geom_point(aes(color = N0_value),size = 1.2) +
   labs(title = "NG phaseplot from 100 simulations", x = "N", y = "G")+
-  scale_color_gradientn(colours = rainbow(100))
+  scale_color_gradientn(colours = rainbow(50))
 
 ggplot(data = output_simulation, aes(x = N, y = L)) + geom_point(aes(color = N0_value),size = 1) +
   labs(title = "NL phaseplot from 100 simulations", x = "N", y = "L")+
