@@ -186,7 +186,10 @@ new_param <- c(rate = 0.6,
                lac_prod_growth = 0.2,
                N_rate_inhib_mid = 50,
                lac_con_mid = 60,
-               lac_prod_mid = 50)
+               lac_prod_mid = 50,
+               N_rate_inhib_max = 0.9,
+               lac_con_max = 0.9,
+               lac_prod_max = 0.9)
 
 sol_real <- ode(init,time,final_model_estimation,new_param)
 
