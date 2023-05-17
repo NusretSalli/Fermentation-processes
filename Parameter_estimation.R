@@ -387,8 +387,8 @@ error_function_hessian <- function(x){
   
 }
 
-calc_hessian_matrix <- hessian(func = error_function_hessian, x = c(minima_point_noise[1],
-                                                                    minima_point_noise[2]))
+calc_hessian_matrix <- hessian(func = error_function_hessian, x = c(rate=minima_point_noise[1],
+                                                                    G50 = minima_point_noise[2]))
 
 solved_hessian_matrix <- solve(calc_hessian_matrix)
 

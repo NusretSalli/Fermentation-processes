@@ -15,9 +15,9 @@ source("Models.R")
 require(plotly)
 
 ## Initial state
-N0 <- 100
-G0 <- 200
-L0 <- 100
+N0 <- 5
+G0 <- 395
+L0 <- 0
 
 x0 <- c(N = N0, G = G0, L = L0)
 
@@ -63,7 +63,7 @@ ggplot(data = output, aes(x = N, y = G)) + geom_point(size = 2, color = "blue", 
   ylim(c(110,250))
 
 
-ggplot(data = output, aes(x = time, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
+ggplot(data = output, aes(x = time, y = N)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
   labs(title = "Number of cells", x = "time", y = "number of cells")
 
 ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) + 
@@ -72,7 +72,7 @@ ggplot(data = output, aes(x = G, y = L)) + geom_point(size = 3, color = "blue") 
 
 # when doing with different initial values #
 
-n_iterations <- 50
+n_iterations <- 100
 
 
 output_simulation <- phase_plane_data(n_iterations)
@@ -197,5 +197,27 @@ fig
 # 
 # gg
 
+n_vec <- output$N
+
+g_vec <- output$G
+
+test <- data.frame(cbind(n_vec, g_vec))
+
+ggplot(data = test,aes(x = n_vec, y = g_vec)) + geom_point(size = 2, color = "blue") +
+  geom_line(color = "red", linewidth = 1.5)+
+  labs(title = "NG phaseplot from 100 simulations", x = "N", y = "G")+
+  scale_color_gradientn(colours = rainbow(50))
+
+plot(n_vec,g_vec,
+     main= "NG plane for plot (a)",
+     ylab = "G",
+     xlab = "N",
+     col = "blue",
+     pch = 18,
+     cex = 1.5)
+
+lines(n_vec,g_vec,
+      lwd = 2,
+      col = "red")
 
 
