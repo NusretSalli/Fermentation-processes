@@ -102,9 +102,9 @@ p$lac_prod_max <- 0.9
 
 time <- seq(0,30,0.1)
 
-sol_real_sens <- ode(init,time,final_model_estimation_lactate_switch,p)
+sol_real <- ode(init,time,final_model_estimation_lactate_switch,p)
 
-sol_real_dataframe_sens <- data.frame(sol_real_sens)
+sol_real <- data.frame(sol_real)
 
 ggplot(data = sol_real_dataframe, aes(x = N, y = G)) + geom_point(size = 3, color = "blue") + geom_line(color = "red", linewidth = 1.5) +
   labs(title = "Number of cells", x = "time", y = "number of cells")
@@ -195,15 +195,15 @@ G50_list <- runif(n_iterations, min = 0.01, max = 400)
 
 N_rate_inhib_growth_list <- runif(n_iterations, min = 0.1, max = 2)
 
-lac_con_growth_list <- runif(n_iterations, min = 0.1, max = 2)
+lac_con_growth_list <- runif(n_iterations, min = 0.1, max = 4)
 
-lac_prod_growth_list <- runif(n_iterations, min = 0.1, max = 2)
+lac_prod_growth_list <- runif(n_iterations, min = 0.1, max = 4)
 
 N_rate_inhib_mid_list <- runif(n_iterations, min = 10, max = 120)
 
-lac_con_mid_list <- runif(n_iterations, min = 10, max = 120)
+lac_con_mid_list <- runif(n_iterations, min = 10, max = 200)
 
-lac_prod_mid_list <- runif(n_iterations, min = 10, max = 120)
+lac_prod_mid_list <- runif(n_iterations, min = 10, max = 220)
 
 n_rate_inhib_max_list <- runif(n_iterations, min = 0.1, max = 1)
 
@@ -248,10 +248,13 @@ pairs_plot_sim(results_PRCC, state_name, param_name)
 
 PRCC_data <- PRCC_data_maker(results_PRCC, state_name, param_name)
 
+PRCC_data_base <- PRCC_data[PRCC_data$variables %in% c("rate", "flow", "G_medium", "G50","N_rate_inhib_growth","N_rate_inhib_mid", "N_rate_inhib_max"),]
+
+PRCC_data_lactate_switch <- PRCC_data[PRCC_data$variables %in% c("lac_con_growth", "lac_prod_growth", "lac_con_mid","lac_prod_mid","lac_con_max", "lac_prod_max"),]
 
 # PRCC plot
 
-PRCC_plot_res <- PRCC_plot(PRCC_data,status)
+PRCC_plot_res <- PRCC_plot(PRCC_data_lactate_switch,status)
 
 PRCC_plot_res
 

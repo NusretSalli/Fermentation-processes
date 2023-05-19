@@ -451,10 +451,38 @@ ggplot(data = output_estimated, aes(x = time, y = L)) + geom_point(size = 3, col
   ylim(0, max(output$L)+5)
 
 
+### demonstration of lactate switch
 
+# test cases
 
+lac_prod_max <- 0.9
 
+lac_prod_mid <- 120
 
+lac_prod_mid2 <- 115
 
-  
-  
+lac_prod_growth <- 0.5
+
+lac_prod_growth2 <- 4.5
+
+G_vector <- seq(50,200,0.5)
+
+lac_prod_example <- (lac_prod_max / (1 + exp(-lac_prod_growth*(G_vector-lac_prod_mid))))
+
+lac_prod_example2 <- (lac_prod_max / (1 + exp(-lac_prod_growth2*(G_vector-lac_prod_mid2))))
+
+plot(G_vector, lac_prod_example, main = "Total",
+     col = "blue",
+     cex = 1,
+     pch = 18,
+     xlab = "Glucose levels",
+     ylab = "Inhibition factor")
+lines(G_vector, lac_prod_example, col = "red",
+      lwd = 2)
+points(G_vector,lac_prod_example2, col = "black",
+       cex = 1,
+       pch = 18)
+lines(G_vector, lac_prod_example2, col = "green",
+      lwd = 2)
+axis(side = 1, at = seq(50,200,10))
+

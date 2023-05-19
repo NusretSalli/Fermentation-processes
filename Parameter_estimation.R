@@ -276,7 +276,7 @@ results_contour_noise <- param_plot_contour(new_param,
                                             c("rate","G50"),
                                             c(0.3,35), # min range
                                             c(0.8,85), # max range
-                                            c(100,100),
+                                            c(300,300),
                                             true_data = noise_test_data)
 
 parameter_1 <- results_contour[[1]]
@@ -387,8 +387,8 @@ error_function_hessian <- function(x){
   
 }
 
-calc_hessian_matrix <- hessian(func = error_function_hessian, x = c(rate=minima_point_noise[1],
-                                                                    G50 = minima_point_noise[2]))
+calc_hessian_matrix <- hessian(func = error_function_hessian, x = c(minima_point_noise[1],
+                                                                    minima_point_noise[2]))
 
 solved_hessian_matrix <- solve(calc_hessian_matrix)
 
@@ -487,6 +487,51 @@ cov_lactate <- cov(param_list_lactate)
 
 corr_lactate <- cor(param_list_lactate)
 
+
+solve_model <- function(pars) {
+  
+  # initial values
+  
+  state <- c(N = N0, G = G0, L = L0)
+  
+  # time vector
+  
+  time <- seq(0,30,0.1)
+  
+  # store the output and returning it
+  
+  output <- ode(y = state, time, final_model_estimation_lactate_switch, parms = pars)
+  
+  return(output)
+}
+
+
+error_function_hessian_lactate <- function(x){
+  
+  parset = names(x)
+  
+  new_param_lactate[parset] <- x
+  
+  output <- solve_model(new_param_lactate)
+  
+  total_err <- 1/2*sum((sol_real - output)^2)
+  
+  return(total_err)
+  
+}
+
+error_function_hessian_lactate(c(lac_prod_growth = 0.5,
+                                 lac_prod_mid = 120,
+                                 lac_prod_max = 0.9))
+
+calc_hessian_matrix <- hessian(func = error_function_hessian_lactate, c(lac_prod_growth = 0.5,
+                                                                lac_prod_mid = 120,
+                                                                lac_prod_max = 0.9))
+
+solved_hessian_matrix <- solve(calc_hessian_matrix)
+
+
+
 ## another example with lac_con ##
 
 parameters <- c(rate = 0.04,
@@ -495,13 +540,13 @@ parameters <- c(rate = 0.04,
                         G50 = 50,
                         N_rate_inhib_growth = 0.5,
                         lac_con_growth = 4,
-                        lac_prod_growth = 4,
+                        lac_prod_growth = 0.5,
                         N_rate_inhib_mid = 120,
                         lac_con_mid = 210,
-                        lac_prod_mid = 40,
+                        lac_prod_mid = 120,
                         N_rate_inhib_max = 0.9,
                         lac_con_max = 0.3,
-                        lac_prod_max = 0.15)
+                        lac_prod_max = 0.9)
 
 N0 <- 5
 G0 <- 395
@@ -584,6 +629,34 @@ histogram_sim_maker(param_list_lactate,
 cov_lactate2 <- cov(param_list_lactate)
 
 corr_lactate2 <- cor(param_list_lactate)
+
+
+error_function_hessian_lactate <- function(x){
+  
+  parset = names(x)
+  
+  new_param_lactate[parset] <- x
+  
+  output <- solve_model(new_param_lactate)
+  
+  total_err <- 1/2*sum((sol_real - output)^2)
+  
+  return(total_err)
+  
+}
+
+error_function_hessian_lactate(c(lac_con_growth = 0.5,
+                                 lac_con_mid = 20,
+                                 lac_con_max = 0.9))
+
+calc_hessian_matrix <- hessian(func = error_function_hessian_lactate, c(lac_con_growth = 0.5,
+                                                                        lac_con_mid = 20,
+                                                                        lac_con_max = 0.9))
+
+solved_hessian_matrix <- solve(calc_hessian_matrix)
+
+
+
 
 ### total lactate switch estimation
 
